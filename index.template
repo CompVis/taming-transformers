@@ -1,0 +1,147 @@
+<!DOCTYPE HTML>
+<!--
+  Based on
+	Spatial by TEMPLATED
+	templated.co @templatedco
+	Released for free under the Creative Commons Attribution 3.0 license (templated.co/license)
+-->
+<html>
+	<head>
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-117339330-4"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'UA-117339330-4');
+    </script>
+
+    <title>
+      Taming Transformers for High-Resolution Image Synthesis
+    </title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<link rel="stylesheet" href="assets/css/main.css" />
+	</head>
+	<body class="landing">
+
+		<!-- Banner -->
+			<section id="banner" style="background-attachment:scroll;">
+        <h2>
+          Taming Transformers for High-Resolution Image Synthesis
+        </h2>
+        <p>
+        <a href="https://github.com/pesser">Patrick Esser</a>&ast;, 
+        <a href="https://github.com/rromb">Robin Rombach</a>&ast;,
+        <a href="https://hci.iwr.uni-heidelberg.de/Staff/bommer">Bj&ouml;rn Ommer</a><br/>
+        <a href="https://www.iwr.uni-heidelberg.de/">IWR, Heidelberg University</a>
+        </p>
+			</section>
+
+			<!-- One -->
+				<section id="one" class="wrapper style1">
+					<div class="container 75%">
+                    <div class="image fit captioned align-left"
+                                style="margin-bottom:2em; box-shadow:0 0;
+                                text-align:justify">
+                      <img src="paper/teaser.png" alt="" style="border:0px solid black"/>
+                      <strong>TL;DR:</strong>
+                      We combine the efficiancy of convolutional approach with
+                      the expressivity of transformers by introducing a
+                      convolutional <em>VQGAN</em>, which learns a codebook of
+                      context-rich visual parts, whose composition is modeled
+                      with an autoregressive transformer.
+                    </div>
+						<div class="row 200%">
+							<div class="6u 12u$(medium) vert-center" style="margin:1% 0">
+                  <div class="container 25%">
+
+
+                    <div class="image fit captioned align-center"
+                                style="margin-bottom:0em; box-shadow:0 0">
+                      <a href="paper/paper.pdf">
+                        <img src="paper/paper.jpg" alt="" style="border:1px solid black"/>
+                      </a>
+                      <!--
+                      <a href="https://arxiv.org/abs/2005.13580">arXiv</a>
+                      <div class="headerDivider"></div>
+                      -->
+                      <a href="paper/paper.bib">BibTeX</a>
+                      <!--
+                      <div class="headerDivider"></div>
+                      <a href="https://github.com/CompVis/taming-transformers">GitHub</a>
+                      -->
+                      <br/>
+                      &ast; equal contribution
+                    </div>
+
+                  </div>
+							</div>
+							<div class="6u$ 12u$(medium)">
+                <h1>Abstract</h1>
+                <p style="text-align: justify">
+  Designed to learn long-range interactions on sequential data, transformers
+  continue to show state-of-the-art results on a wide variety of tasks.  In
+  contrast to CNNs, they contain no inductive bias that prioritizes local
+  interactions. This makes them expressive, but also computationally infeasible
+  for long sequences, such as high-resolution images.  We demonstrate how
+  combining the effectiveness of the inductive bias of CNNs with the
+  expressivity of transformers enables
+  them to model and thereby synthesize high-resolution images.
+  We show how to (i) use CNNs to learn a context-rich vocabulary of
+  image constituents, and in turn (ii) utilize transformers to efficiently
+  model their composition within high-resolution images.
+  Our approach is readily applied to conditional synthesis tasks, where both
+  non-spatial information, such as object classes, and spatial information,
+  such as segmentations, can
+  control the generated image.
+  In particular, we present the first results on semantically-guided synthesis
+  of megapixel images with transformers.
+                </p>
+							</div>
+						</div>
+            <!--
+          <p style="text-align:center">Related work <br/><a
+             href="https://compvis.github.io/iin/">"A Disentangling
+             Invertible Interpretation Network for Explaining Latent
+           Representations"</a></p>
+					</div>
+            -->
+				</section>
+
+			<!-- Two -->
+				<section id="two" class="wrapper style2 special">
+					<div class="container">
+						<header class="major">
+							<h2>Results</h2>
+							<p>and applications of our model.</p>
+						</header>
+
+            __TEMPLATE_STRING__
+
+				  </div>
+				</section>
+
+
+			<!-- Four -->
+				<section id="four" class="wrapper style3 special"
+          style="background-attachment:scroll;background-position:center bottom;">
+					<div class="container">
+						<header class="major">
+							<h2>Acknowledgement</h2>
+              <p>
+              This page is based on a design by <a href="http://templated.co">TEMPLATED</a>.
+              </p>
+						</header>
+					</div>
+				</section>
+
+		<!-- Scripts -->
+			<script src="assets/js/jquery.min.js"></script>
+			<script src="assets/js/skel.min.js"></script>
+			<script src="assets/js/util.js"></script>
+			<script src="assets/js/main.js"></script>
+
+	</body>
+</html>

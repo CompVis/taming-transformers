@@ -1,0 +1,446 @@
+<!DOCTYPE HTML>
+<!--
+  Based on
+	Spatial by TEMPLATED
+	templated.co @templatedco
+	Released for free under the Creative Commons Attribution 3.0 license (templated.co/license)
+-->
+<html>
+	<head>
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-117339330-4"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'UA-117339330-4');
+    </script>
+
+    <title>
+      Taming Transformers for High-Resolution Image Synthesis
+    </title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<link rel="stylesheet" href="assets/css/main.css" />
+	</head>
+	<body class="landing">
+
+		<!-- Banner -->
+			<section id="banner" style="background-attachment:scroll;">
+        <h2>
+          Taming Transformers for High-Resolution Image Synthesis
+        </h2>
+        <p>
+        <a href="https://github.com/pesser">Patrick Esser</a>&ast;, 
+        <a href="https://github.com/rromb">Robin Rombach</a>&ast;,
+        <a href="https://hci.iwr.uni-heidelberg.de/Staff/bommer">Bj&ouml;rn Ommer</a><br/>
+        <a href="https://www.iwr.uni-heidelberg.de/">IWR, Heidelberg University</a>
+        </p>
+			</section>
+
+			<!-- One -->
+				<section id="one" class="wrapper style1">
+					<div class="container 75%">
+                    <div class="image fit captioned align-left"
+                                style="margin-bottom:2em; box-shadow:0 0;
+                                text-align:justify">
+                      <img src="paper/teaser.png" alt="" style="border:0px solid black"/>
+                      <strong>TL;DR:</strong>
+                      We combine the efficiancy of convolutional approach with
+                      the expressivity of transformers by introducing a
+                      convolutional <em>VQGAN</em>, which learns a codebook of
+                      context-rich visual parts, whose composition is modeled
+                      with an autoregressive transformer.
+                    </div>
+						<div class="row 200%">
+							<div class="6u 12u$(medium) vert-center" style="margin:1% 0">
+                  <div class="container 25%">
+
+
+                    <div class="image fit captioned align-center"
+                                style="margin-bottom:0em; box-shadow:0 0">
+                      <a href="paper/paper.pdf">
+                        <img src="paper/paper.jpg" alt="" style="border:1px solid black"/>
+                      </a>
+                      <!--
+                      <a href="https://arxiv.org/abs/2005.13580">arXiv</a>
+                      <div class="headerDivider"></div>
+                      -->
+                      <a href="paper/paper.bib">BibTeX</a>
+                      <!--
+                      <div class="headerDivider"></div>
+                      <a href="https://github.com/CompVis/taming-transformers">GitHub</a>
+                      -->
+                      <br/>
+                      &ast; equal contribution
+                    </div>
+
+                  </div>
+							</div>
+							<div class="6u$ 12u$(medium)">
+                <h1>Abstract</h1>
+                <p style="text-align: justify">
+  Designed to learn long-range interactions on sequential data, transformers
+  continue to show state-of-the-art results on a wide variety of tasks.  In
+  contrast to CNNs, they contain no inductive bias that prioritizes local
+  interactions. This makes them expressive, but also computationally infeasible
+  for long sequences, such as high-resolution images.  We demonstrate how
+  combining the effectiveness of the inductive bias of CNNs with the
+  expressivity of transformers enables
+  them to model and thereby synthesize high-resolution images.
+  We show how to (i) use CNNs to learn a context-rich vocabulary of
+  image constituents, and in turn (ii) utilize transformers to efficiently
+  model their composition within high-resolution images.
+  Our approach is readily applied to conditional synthesis tasks, where both
+  non-spatial information, such as object classes, and spatial information,
+  such as segmentations, can
+  control the generated image.
+  In particular, we present the first results on semantically-guided synthesis
+  of megapixel images with transformers.
+                </p>
+							</div>
+						</div>
+            <!--
+          <p style="text-align:center">Related work <br/><a
+             href="https://compvis.github.io/iin/">"A Disentangling
+             Invertible Interpretation Network for Explaining Latent
+           Representations"</a></p>
+					</div>
+            -->
+				</section>
+
+			<!-- Two -->
+				<section id="two" class="wrapper style2 special">
+					<div class="container">
+						<header class="major">
+							<h2>Results</h2>
+							<p>and applications of our model.</p>
+						</header>
+
+            <div class="row 150%">
+<div class="6u 12u$(xsmall)">
+<div class="image fit captioned align-just">
+<a href="images/article-Figure2-1.jpg">
+<img src="images/article-Figure2-1.jpg" alt="" />
+</a>
+Figure 2. Our approach uses a convolutional VQGAN to learn a codebook of context-rich visual parts, whose composition is subsequently modeled with an autoregressive transformer architecture. A discrete codebook provides the interface between these architectures and a patch-based discriminator enables strong compression while retaining high perceptual quality. This method introduces the efficiency of convolutional approaches to transformer based high resolution image synthesis.
+</div>
+</div>
+<div class="6u$ 12u$(xsmall)">
+
+<div class="image fit captioned align-just">
+<a href="images/article-Table1-1.jpg">
+<img src="images/article-Table1-1.jpg" alt="" />
+</a>
+Table 1. Comparing Transformer and PixelSNAIL architectures across different datasets and model sizes. For all settings, transformers outperform the state-of-the-art model from the PixelCNN family, PixelSNAIL in terms of NLL. This holds both when comparing NLL at fixed times (PixelSNAIL trains roughly 2 times faster) and when trained for a fixed number of steps. See Sec. 4.1 for the abbreviations.
+</div>
+</div>
+</div>
+<div class="row 150%">
+<div class="6u 12u$(xsmall)">
+
+<div class="image fit captioned align-just">
+<a href="images/article-Figure5-1.jpg">
+<img src="images/article-Figure5-1.jpg" alt="" />
+</a>
+Figure 5. Samples generated from semantic layouts on S-FLCKR. Sizes from top-to-bottom: 1280 × 832, 1024 × 416 and 1280 × 240 pixels. Best viewed zoomed in. A larger visualization can be found in the appendix, see Fig 13.
+</div>
+</div>
+<div class="6u$ 12u$(xsmall)">
+
+<div class="image fit captioned align-just">
+<a href="images/article-Figure6-1.jpg">
+<img src="images/article-Figure6-1.jpg" alt="" />
+</a>
+Figure 6. Applying the sliding attention window approach (Fig. 3) to various conditional image synthesis tasks. Top: Depth-to-image on RIN, 2nd row: Stochastic superresolution on IN, 3rd and 4th row: Semantic synthesis on S-FLCKR, bottom: Edge-guided synthesis on IN. The resulting images vary between 368 × 496 and 1024× 576, hence they are best viewed zoomed in.
+</div>
+</div>
+</div>
+<div class="row 150%">
+<div class="6u 12u$(xsmall)">
+
+<div class="image fit captioned align-just">
+<a href="images/article-Figure11-1.jpg">
+<img src="images/article-Figure11-1.jpg" alt="" />
+</a>
+Figure 11. Comparing our approach with the pixel-based approach of [7]. Here, we use our f = 16 S-FLCKR model to obtain high-fidelity image completions of the inputs depicted on the left (half completions). For each conditioning, we show three of our samples (top) and three of [7] (bottom).
+</div>
+</div>
+<div class="6u$ 12u$(xsmall)">
+
+<div class="image fit captioned align-just">
+<a href="images/article-Figure12-1.jpg">
+<img src="images/article-Figure12-1.jpg" alt="" />
+</a>
+Figure 12. Comparing our approach with the pixel-based approach of [7]. Here, we use our f = 16 S-FLCKR model to obtain high-fidelity image completions of the inputs depicted on the left (half completions). For each conditioning, we show three of our samples (top) and three of [7] (bottom).
+</div>
+</div>
+</div>
+<div class="row 150%">
+<div class="6u 12u$(xsmall)">
+
+<div class="image fit captioned align-just">
+<a href="images/article-Figure4-1.jpg">
+<img src="images/article-Figure4-1.jpg" alt="" />
+</a>
+Figure 4. Transformers within our setting unify a wide range of image synthesis tasks. We show 256 × 256 synthesis results across different conditioning inputs and datasets, all obtained with the same approach to exploit inductive biases of effective CNN based VQGAN architectures in combination with the expressivity of transformer architectures. Top row: Completions from unconditional training on ImageNet. 2nd row: Depth-to-Image on RIN. 3rd row: Semantically guided synthesis on COCO-Stuff (left) and ADE20K (right). 4th row: Pose-guided person generation on DeepFashion. Bottom row: Class-conditional samples on RIN.
+</div>
+</div>
+<div class="6u$ 12u$(xsmall)">
+
+<div class="image fit captioned align-just">
+<a href="images/article-Figure23-1.jpg">
+<img src="images/article-Figure23-1.jpg" alt="" />
+</a>
+Figure 23. Unconditional samples from a model trained on LSUN Churches & Towers, using the sliding attention window.
+</div>
+</div>
+</div>
+<div class="row 150%">
+<div class="6u 12u$(xsmall)">
+
+<div class="image fit captioned align-just">
+<a href="images/article-Figure13-1.jpg">
+<img src="images/article-Figure13-1.jpg" alt="" />
+</a>
+Figure 13. Samples generated from semantic layouts on S-FLCKR. Sizes from top-to-bottom: 1280 × 832, 1024 × 416 and 1280 × 240 pixels.
+</div>
+</div>
+<div class="6u$ 12u$(xsmall)">
+
+<div class="image fit captioned align-just">
+<a href="images/article-Figure14-1.jpg">
+<img src="images/article-Figure14-1.jpg" alt="" />
+</a>
+Figure 14. Samples generated from semantic layouts on S-FLCKR. Sizes from top-to-bottom: 1536× 512, 1840× 1024, and 1536× 620 pixels.
+</div>
+</div>
+</div>
+<div class="row 150%">
+<div class="6u 12u$(xsmall)">
+
+<div class="image fit captioned align-just">
+<a href="images/article-Figure15-1.jpg">
+<img src="images/article-Figure15-1.jpg" alt="" />
+</a>
+Figure 15. Samples generated from semantic layouts on S-FLCKR. Sizes from top-to-bottom: 2048× 512, 1460× 440, 2032× 448 and 2016× 672 pixels.
+</div>
+</div>
+<div class="6u$ 12u$(xsmall)">
+
+<div class="image fit captioned align-just">
+<a href="images/article-Figure16-1.jpg">
+<img src="images/article-Figure16-1.jpg" alt="" />
+</a>
+Figure 16. Samples generated from semantic layouts on S-FLCKR. Sizes from top-to-bottom: 1280 × 832, 1024 × 416 and 1280 × 240 pixels.
+</div>
+</div>
+</div>
+<div class="row 150%">
+<div class="6u 12u$(xsmall)">
+
+<div class="image fit captioned align-just">
+<a href="images/article-Figure17-1.jpg">
+<img src="images/article-Figure17-1.jpg" alt="" />
+</a>
+Figure 17. Depth-guided neural rendering on RIN with f = 16 using the sliding attention window.
+</div>
+</div>
+<div class="6u$ 12u$(xsmall)">
+
+<div class="image fit captioned align-just">
+<a href="images/article-Figure18-1.jpg">
+<img src="images/article-Figure18-1.jpg" alt="" />
+</a>
+Figure 18. Depth-guided neural rendering on RIN with f = 16 using the sliding attention window.
+</div>
+</div>
+</div>
+<div class="row 150%">
+<div class="6u 12u$(xsmall)">
+
+<div class="image fit captioned align-just">
+<a href="images/article-Figure19-1.jpg">
+<img src="images/article-Figure19-1.jpg" alt="" />
+</a>
+Figure 19. Intentionally limiting the receptive field can lead to interesting creative applications like this one: Edge-to-Image synthesis on IN with f = 8, using the sliding attention window.
+</div>
+</div>
+<div class="6u$ 12u$(xsmall)">
+
+<div class="image fit captioned align-just">
+<a href="images/article-Figure20-1.jpg">
+<img src="images/article-Figure20-1.jpg" alt="" />
+</a>
+Figure 20. Additional results for stochastic superresolution with an f = 16 model on IN, using the sliding attention window.
+</div>
+</div>
+</div>
+<div class="row 150%">
+<div class="6u 12u$(xsmall)">
+
+<div class="image fit captioned align-just">
+<a href="images/article-Figure21-1.jpg">
+<img src="images/article-Figure21-1.jpg" alt="" />
+</a>
+Figure 21. Samples generated from semantic layouts on S-FLCKR with f = 16, using the sliding attention window.
+</div>
+</div>
+<div class="6u$ 12u$(xsmall)">
+
+<div class="image fit captioned align-just">
+<a href="images/article-Figure22-1.jpg">
+<img src="images/article-Figure22-1.jpg" alt="" />
+</a>
+Figure 22. Samples generated from semantic layouts on S-FLCKR with f = 32, using the sliding attention window.
+</div>
+</div>
+</div>
+<div class="row 150%">
+<div class="6u 12u$(xsmall)">
+
+<div class="image fit captioned align-just">
+<a href="images/article-Figure7-1.jpg">
+<img src="images/article-Figure7-1.jpg" alt="" />
+</a>
+Figure 7. Evaluating the importance of effective codebook for HQ-Faces (CelebA-HQ and FFHQ) for a fixed sequence length |s|= 16·16 = 256. Globally consistent structures can only be modeled with a context-rich vocabulary (right). All samples are generated with temperature t = 1.0 and top-k sampling with k = 100. Last row reports the speedup over the f1 baseline which operates directly on pixels and takes 7258 seconds to produce a sample on a NVIDIA GeForce GTX Titan X.
+</div>
+</div>
+<div class="6u$ 12u$(xsmall)">
+
+<div class="image fit captioned align-just">
+<a href="images/article-Figure8-1.jpg">
+<img src="images/article-Figure8-1.jpg" alt="" />
+</a>
+Figure 8. Trade-off between negative log-likelihood (nll) and reconstruction error. While context-rich encodings obtained with large factors f allow the transformer to effectively model long-range interactions, the reconstructions capabilities and hence quality of samples suffer after a critical value (here, f = 16). For more details, see Sec. B.
+</div>
+</div>
+</div>
+<div class="row 150%">
+<div class="6u 12u$(xsmall)">
+
+<div class="image fit captioned align-just">
+<a href="images/article-Figure9-1.jpg">
+<img src="images/article-Figure9-1.jpg" alt="" />
+</a>
+Figure 9. We compare the ability of VQVAEs and VQGANs to learn perceptually rich encodings, which allow for high-fidelity reconstructions with large factors f . Here, using the same architecture and f = 16, VQVAE reconstructions are blurry and contain little information about the image, whereas VQGAN recovers images faithfully. See also Sec. B.
+</div>
+</div>
+<div class="6u$ 12u$(xsmall)">
+
+<div class="image fit captioned align-just">
+<a href="images/article-Figure10-1.jpg">
+<img src="images/article-Figure10-1.jpg" alt="" />
+</a>
+Figure 10. Samples on landscape dataset (left) obtained with different factors f , analogous to Fig. 7. In contrast to faces, a factor of f = 32 still allows for faithful reconstructions (right). See also Sec. B.
+</div>
+</div>
+</div>
+<div class="row 150%">
+<div class="6u 12u$(xsmall)">
+
+<div class="image fit captioned align-just">
+<a href="images/article-Figure24-1.jpg">
+<img src="images/article-Figure24-1.jpg" alt="" />
+</a>
+Figure 24. Additional 256× 256 results on the ADE20K dataset.
+</div>
+</div>
+<div class="6u$ 12u$(xsmall)">
+
+<div class="image fit captioned align-just">
+<a href="images/article-Figure25-1.jpg">
+<img src="images/article-Figure25-1.jpg" alt="" />
+</a>
+Figure 25. Additional 256× 256 results on the COCO-Stuff dataset.
+</div>
+</div>
+</div>
+<div class="row 150%">
+<div class="6u 12u$(xsmall)">
+
+<div class="image fit captioned align-just">
+<a href="images/article-Figure26-1.jpg">
+<img src="images/article-Figure26-1.jpg" alt="" />
+</a>
+Figure 26. Conditional samples for the depth-to-image model on IN.
+</div>
+</div>
+<div class="6u$ 12u$(xsmall)">
+
+<div class="image fit captioned align-just">
+<a href="images/article-Figure27-1.jpg">
+<img src="images/article-Figure27-1.jpg" alt="" />
+</a>
+Figure 27. Conditional samples for the pose-guided synthesis model via keypoints on DeepFashion.
+</div>
+</div>
+</div>
+<div class="row 150%">
+<div class="6u 12u$(xsmall)">
+
+<div class="image fit captioned align-just">
+<a href="images/article-Figure28-1.jpg">
+<img src="images/article-Figure28-1.jpg" alt="" />
+</a>
+Figure 28. Samples produced by the class-conditional model trained on RIN.
+</div>
+</div>
+<div class="6u$ 12u$(xsmall)">
+
+<div class="image fit captioned align-just">
+<a href="images/article-Figure29-1.jpg">
+<img src="images/article-Figure29-1.jpg" alt="" />
+</a>
+Figure 29. Samples synthesized by the class-conditional IN model.
+</div>
+</div>
+</div>
+<div class="row 150%">
+<div class="6u 12u$(xsmall)">
+
+<div class="image fit captioned align-just">
+<a href="images/article-Figure30-1.jpg">
+<img src="images/article-Figure30-1.jpg" alt="" />
+</a>
+Figure 30. Top: All sequence permutations we investigate, illustrated on a 4× 4 grid. Bottom: The transformer architecture is permutation invariant but next-token prediction is not: The average loss on the validation split of ImageNet, corresponding to the negative log-likelihood, differs significantly between different prediction orderings. Among our choices, the commonly used row-major order performs best.
+</div>
+</div>
+<div class="6u$ 12u$(xsmall)">
+
+<div class="image fit captioned align-just">
+<a href="images/article-Figure31-1.jpg">
+<img src="images/article-Figure31-1.jpg" alt="" />
+</a>
+Figure 31. Random samples from transformer models trained with different orderings for autoregressive prediction as described in Sec. 4.4.
+</div>
+</div>
+</div>
+
+
+				  </div>
+				</section>
+
+
+			<!-- Four -->
+				<section id="four" class="wrapper style3 special"
+          style="background-attachment:scroll;background-position:center bottom;">
+					<div class="container">
+						<header class="major">
+							<h2>Acknowledgement</h2>
+              <p>
+              This page is based on a design by <a href="http://templated.co">TEMPLATED</a>.
+              </p>
+						</header>
+					</div>
+				</section>
+
+		<!-- Scripts -->
+			<script src="assets/js/jquery.min.js"></script>
+			<script src="assets/js/skel.min.js"></script>
+			<script src="assets/js/util.js"></script>
+			<script src="assets/js/main.js"></script>
+
+	</body>
+</html>
