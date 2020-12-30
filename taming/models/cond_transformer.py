@@ -5,8 +5,6 @@ import pytorch_lightning as pl
 
 from main import instantiate_from_config
 
-# TODO probably need to update TrainResult / EvalResult etc
-
 
 def disabled_train(self, mode=True):
     """Overwrite model.train with this function to make sure train/eval mode
@@ -269,17 +267,13 @@ class Net2NetTransformer(pl.LightningModule):
 
     def training_step(self, batch, batch_idx):
         loss = self.shared_step(batch, batch_idx)
-        output = pl.TrainResult(minimize=loss, checkpoint_on=loss)
-        output.log("train/loss", loss,
-                   prog_bar=True, logger=True, on_step=True, on_epoch=True)
-        return output
+        self.log("train/loss", loss, prog_bar=True, logger=True, on_step=True, on_epoch=True)
+        return loss
 
     def validation_step(self, batch, batch_idx):
         loss = self.shared_step(batch, batch_idx)
-        output = pl.EvalResult(checkpoint_on=loss)
-        output.log("val/loss", loss,
-                   prog_bar=True, logger=True, on_step=False, on_epoch=True)
-        return output
+        self.log("val/loss", loss, prog_bar=True, logger=True, on_step=True, on_epoch=True)
+        return loss
 
     def configure_optimizers(self):
         """

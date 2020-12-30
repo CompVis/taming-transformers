@@ -36,9 +36,15 @@ from the [FFHQ repository](https://github.com/NVlabs/ffhq-dataset).
 ## Running pretrained models
 
 ### S-FLCKR
-Download the [2020-11-09T13-31-51_sflckr](TODO) and place it into `logs`. Run
+Download [2020-11-09T13-31-51_sflckr](TODO) and place it into `logs`. Run
 ```
-streamlit run scripts/sample_conditional.py -- -r logs/TODO/
+streamlit run scripts/sample_conditional.py -- -r logs/2020-11-09T13-31-51_sflckr/
+```
+
+### FacesHQ
+Download [2020-11-09T13-31-51_sflckr](TODO) and place it into `logs`. Run
+```
+streamlit run scripts/sample_conditional.py -- -r logs/2020-11-13T21-41-45_faceshq_transformer/
 ```
 
 ## Training models
@@ -48,6 +54,15 @@ streamlit run scripts/sample_conditional.py -- -r logs/TODO/
 Train a VQGAN with
 ```
 python main.py --base configs/faceshq_vqgan.yaml -t True --gpus 0,
+```
+
+Then, adjust the checkpoint path of the config key
+`model.params.first_stage_config.params.ckpt_path` in
+`configs/faceshq_transformer.yaml` (or download
+[2020-11-09T13-33-36_faceshq_vqgan](TODO) and place into `logs`, which
+corresponds to the preconfigured checkpoint path), then run
+```
+python main.py --base configs/faceshq_transformer.yaml -t True --gpus 0,
 ```
 
 ## Shout-outs
