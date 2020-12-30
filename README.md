@@ -1,6 +1,6 @@
 # Taming Transformers for High-Resolution Image Synthesis
 
-Code accompanying
+Code for
 
 [**Taming Transformers for High-Resolution Image Synthesis**](https://compvis.github.io/taming-transformers/)<br/>
 [Patrick Esser](https://github.com/pesser)\*,
@@ -8,7 +8,7 @@ Code accompanying
 [Björn Ommer](https://hci.iwr.uni-heidelberg.de/Staff/bommer)<br/>
 \* equal contribution
 
-**tl;dr** We combine the efficiancy of convolutional approach with the expressivity of transformers by introducing a convolutional VQGAN, which learns a codebook of context-rich visual parts, whose composition is modeled with an autoregressive transformer.
+**tl;dr** We combine the efficiancy of convolutional approaches with the expressivity of transformers by introducing a convolutional VQGAN, which learns a codebook of context-rich visual parts, whose composition is modeled with an autoregressive transformer.
 
 ![teaser](assets/teaser.png)
 [arXiv](https://arxiv.org/abs/2012.09841) | [BibTeX](#bibtex) | [Project Page](https://compvis.github.io/taming-transformers/)
@@ -45,7 +45,12 @@ Create a symlink `data/ffhq` pointing to the `images1024x1024` folder obtained
 from the [FFHQ repository](https://github.com/NVlabs/ffhq-dataset).
 
 ## Running pretrained models
-TODO
+
+### S-FLCKR
+Download the [2020-11-09T13-31-51_sflckr](TODO) and place it into `logs`. Run
+```
+streamlit run scripts/sample_conditional.py -- -r logs/TODO/
+```
 
 ## Shout-outs
 Thanks to everyone who makes their code and models available. In particular,

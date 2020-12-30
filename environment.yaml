@@ -3,20 +3,20 @@ channels:
   - pytorch
   - defaults
 dependencies:
-  - python=3.7
-  - pip=19.3
+  - python=3.8.5
+  - pip=20.3
   - cudatoolkit=10.2
-  - pytorch=1.6
-  - torchvision=0.7
-  - numpy=1.18
+  - pytorch=1.7.0
+  - torchvision=0.8.1
+  - numpy=1.19.2
   - pip:
     - albumentations==0.4.3
     - opencv-python==4.1.2.30
     - pudb==2019.2
     - imageio==2.9.0
     - imageio-ffmpeg==0.4.2
-    - pytorch-lightning==0.9.0
+    - pytorch-lightning==1.0.8
     - omegaconf==2.0.0
-    - streamlit==0.71.0
     - test-tube>=0.7.5
+    - streamlit>=0.73.1
     - -e .
