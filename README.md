@@ -24,17 +24,6 @@ conda activate taming
 
 ## Data Preparation
 
-### CelebA
-Create a symlink 'data/CelebA' pointing to a folder which contains the following files:
-```  
-.
-  ├── identity_CelebA.txt
-  ├── img_align_celeba
-  ├── list_attr_celeba.txt
-  └── list_eval_partition.txt
-```
-These files can be obtained [here](http://mmlab.ie.cuhk.edu.hk/projects/CelebA.html).
-
 ### CelebA-HQ
 Create a symlink `data/celebahq` pointing to a folder containing the `.npy`
 files of CelebA-HQ (instructions to obtain them can be found in the [PGGAN
@@ -50,6 +39,15 @@ from the [FFHQ repository](https://github.com/NVlabs/ffhq-dataset).
 Download the [2020-11-09T13-31-51_sflckr](TODO) and place it into `logs`. Run
 ```
 streamlit run scripts/sample_conditional.py -- -r logs/TODO/
+```
+
+## Training models
+
+### FacesHQ
+
+Train a VQGAN with
+```
+python main.py --base configs/faceshq_vqgan.yaml -t True --gpus 0,
 ```
 
 ## Shout-outs
