@@ -64,7 +64,15 @@ You will then need to prepare the depth data using
 `val`, each mirroring the structure of the corresponding ImageNet folder
 described above and containing a `png` file for each of ImageNet's `JPEG`
 files. The `png` encodes `float32` depth values obtained from MiDaS as RGBA
-images. We provide the script `TODO` to generate this data.
+images. We provide the script `scripts/extract_depth.py` to generate this data.
+**Please note** that this script uses [MiDaS via PyTorch
+Hub](https://pytorch.org/hub/intelisl_midas_v2/). When we prepared the data,
+the hub provided the [MiDaS
+v2.0](https://github.com/intel-isl/MiDaS/releases/tag/v2) version, but now it
+provides a v2.1 version. We haven't tested our models with depth maps obtained
+via v2.1 and if you want to make sure that things work as expected, you must
+adjust the script to make sure it explicitly uses
+[v2.0](https://github.com/intel-isl/MiDaS/releases/tag/v2)!
 
 ### CelebA-HQ
 Create a symlink `data/celebahq` pointing to a folder containing the `.npy`
@@ -89,13 +97,13 @@ streamlit run scripts/sample_conditional.py -- -r logs/2020-11-09T13-31-51_sflck
 ```
 
 ### FacesHQ
-Download [2020-11-09T13-31-51_sflckr](TODO) and place it into `logs`. Run
+Download [2020-11-13T21-41-45_faceshq_transformer](https://k00.fr/qqfl2do8) and place it into `logs`. Run
 ```
 streamlit run scripts/sample_conditional.py -- -r logs/2020-11-13T21-41-45_faceshq_transformer/
 ```
 
 ### D-RIN
-Download [2020-11-20T12-54-32_drin_transformer](TODO) and place it into `logs`. Run
+Download [2020-11-20T12-54-32_drin_transformer](https://k00.fr/39jcugc5) and place it into `logs`. Run
 ```
 streamlit run scripts/sample_conditional.py -- -r logs/2020-11-20T12-54-32_drin_transformer/
 ```
@@ -112,7 +120,7 @@ python main.py --base configs/faceshq_vqgan.yaml -t True --gpus 0,
 Then, adjust the checkpoint path of the config key
 `model.params.first_stage_config.params.ckpt_path` in
 `configs/faceshq_transformer.yaml` (or download
-[2020-11-09T13-33-36_faceshq_vqgan](TODO) and place into `logs`, which
+[2020-11-09T13-33-36_faceshq_vqgan](https://k00.fr/uxy5usa9) and place into `logs`, which
 corresponds to the preconfigured checkpoint path), then run
 ```
 python main.py --base configs/faceshq_transformer.yaml -t True --gpus 0,
@@ -125,7 +133,7 @@ Train a VQGAN on ImageNet with
 python main.py --base configs/imagenet_vqgan.yaml -t True --gpus 0,
 ```
 
-or download a pretrained one from [2020-09-23T17-56-33_imagenet_vqgan](TODO)
+or download a pretrained one from [2020-09-23T17-56-33_imagenet_vqgan](https://k00.fr/u0j2dtac)
 and place under `logs`. If you trained your own, adjust the path in the config
 key `model.params.first_stage_config.params.ckpt_path` of
 `configs/drin_transformer.yaml`.
@@ -135,7 +143,7 @@ Train a VQGAN on Depth Maps of ImageNet with
 python main.py --base configs/imagenetdepth_vqgan.yaml -t True --gpus 0,
 ```
 
-or download a pretrained one from [2020-11-03T15-34-24_imagenetdepth_vqgan](TODO)
+or download a pretrained one from [2020-11-03T15-34-24_imagenetdepth_vqgan](https://k00.fr/55rlxs6i)
 and place under `logs`. If you trained your own, adjust the path in the config
 key `model.params.cond_stage_config.params.ckpt_path` of
 `configs/drin_transformer.yaml`.
