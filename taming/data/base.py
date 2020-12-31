@@ -21,11 +21,11 @@ class ConcatDatasetWithIndex(ConcatDataset):
 
 
 class ImagePaths(Dataset):
-    def __init__(self, paths, size=None, random_crop=False):
+    def __init__(self, paths, size=None, random_crop=False, labels=None):
         self.size = size
         self.random_crop = random_crop
 
-        self.labels = dict()
+        self.labels = dict() if labels is None else labels
         self.labels["file_path_"] = paths
         self._length = len(paths)
 
