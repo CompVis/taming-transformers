@@ -81,8 +81,9 @@ from the [FFHQ repository](https://github.com/NVlabs/ffhq-dataset).
 ![teaser](assets/sunset_and_ocean.jpg)
 ![teaser](assets/lake_in_the_mountains.png)
 
-Download the [2020-11-09T13-31-51_sflckr](https://heibox.uni-heidelberg.de/d/73487ab6e5314cb5adba/) folder and place it into `logs`. 
-Then, run
+Download the
+[2020-11-09T13-31-51_sflckr](https://heibox.uni-heidelberg.de/d/73487ab6e5314cb5adba/)
+folder and place it into `logs`.  Then, run
 ```
 streamlit run scripts/sample_conditional.py -- -r logs/2020-11-09T13-31-51_sflckr/
 ```

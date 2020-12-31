@@ -259,28 +259,21 @@ class Net2NetTransformer(pl.LightningModule):
             c = c[:N]
         return x, c
 
-    def compute_loss(self, logits, targets, split="train"):
-        loss = F.cross_entropy(logits.reshape(-1, logits.size(-1)), targets.reshape(-1))
-        return loss, {f"{split}/loss": loss.detach()}
-
     def shared_step(self, batch, batch_idx):
         x, c = self.get_xc(batch)
         logits, target = self(x, c)
-        return logits, target
+        loss = F.cross_entropy(logits.reshape(-1, logits.size(-1)), target.reshape(-1))
+        return loss
 
     def training_step(self, batch, batch_idx):
-        logits, target = self.shared_step(batch, batch_idx)
-        loss, log_dict = self.compute_loss(logits, target, split="train")
-        self.log("train/loss", loss,
-                 prog_bar=True, logger=True, on_step=True, on_epoch=True)
+        loss = self.shared_step(batch, batch_idx)
+        self.log("train/loss", loss, prog_bar=True, logger=True, on_step=True, on_epoch=True)
         return loss
 
     def validation_step(self, batch, batch_idx):
-        logits, target = self.shared_step(batch, batch_idx)
-        loss, log_dict = self.compute_loss(logits, target, split="val")
-        self.log("val/loss", loss,
-                 prog_bar=True, logger=True, on_step=True, on_epoch=True)
-        return log_dict
+        loss = self.shared_step(batch, batch_idx)
+        self.log("val/loss", loss, prog_bar=True, logger=True, on_step=True, on_epoch=True)
+        return loss
 
     def configure_optimizers(self):
         """
