@@ -113,6 +113,22 @@ repository](https://github.com/tkarras/progressive_growing_of_gans)).
 Create a symlink `data/ffhq` pointing to the `images1024x1024` folder obtained
 from the [FFHQ repository](https://github.com/NVlabs/ffhq-dataset).
 
+### S-FLCKR
+Unfortunately, we are not allowed to distribute the images we collected for the
+S-FLCKR dataset and can therefore only give a description how it was produced.
+There are many resources on [collecting images from the
+web](https://github.com/adrianmrit/flickrdatasets) to get started.
+We collected sufficiently large images from [flickr](https://www.flickr.com)
+(see `data/flickr_tags.txt` for a full list of tags used to find images)
+and various [subreddits](https://www.reddit.com/r/sfwpornnetwork/wiki/network)
+(see `data/subreddits.txt` for all subreddits that were used).
+Overall, we collected 107625 images, and split them randomly into 96861
+training images and 10764 validation images. We then obtained segmentation
+masks for each image using [DeepLab v2](https://arxiv.org/abs/1606.00915)
+trained on [COCO-Stuff](https://arxiv.org/abs/1612.03716). We used a [PyTorch
+reimplementation](https://github.com/kazuto1011/deeplab-pytorch) and include an
+example script for this process in `scripts/extract_segmentation.py`.
+
 ## Training models
 
 ### FacesHQ
