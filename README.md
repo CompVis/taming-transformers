@@ -25,7 +25,6 @@ conda activate taming
 
 ### S-FLCKR
 ![teaser](assets/sunset_and_ocean.jpg)
-![teaser](assets/lake_in_the_mountains.png)
 
 Download the
 [2020-11-09T13-31-51_sflckr](https://heibox.uni-heidelberg.de/d/73487ab6e5314cb5adba/)
@@ -35,6 +34,8 @@ streamlit run scripts/sample_conditional.py -- -r logs/2020-11-09T13-31-51_sflck
 ```
 
 ### FacesHQ
+![teaser](assets/faceshq.jpg)
+
 Download [2020-11-13T21-41-45_faceshq_transformer](https://k00.fr/qqfl2do8) and
 place it into `logs`. Follow the data preparation steps for
 [CelebA-HQ](#celeba-hq) and [FFHQ](#ffhq). Run
@@ -43,6 +44,8 @@ streamlit run scripts/sample_conditional.py -- -r logs/2020-11-13T21-41-45_faces
 ```
 
 ### D-RIN
+![teaser](assets/drin.jpg)
+
 Download [2020-11-20T12-54-32_drin_transformer](https://k00.fr/39jcugc5) and
 place it into `logs`. Follow the data preparation steps for
 [ImageNet](#imagenet). Run
