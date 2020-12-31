@@ -5,8 +5,6 @@ import pytorch_lightning as pl
 
 from main import instantiate_from_config
 
-# TODO probably need to update TrainResult / EvalResult etc
-
 
 def disabled_train(self, mode=True):
     """Overwrite model.train with this function to make sure train/eval mode

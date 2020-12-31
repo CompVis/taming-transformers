@@ -55,7 +55,6 @@ class VQModel(pl.LightningModule):
         return quant, emb_loss, info
 
     def decode(self, quant):
-        #if hasattr(self, "post_quant_conv"):
         quant = self.post_quant_conv(quant)
         dec = self.decoder(quant)
         return dec
@@ -78,8 +77,6 @@ class VQModel(pl.LightningModule):
         return x.float()
 
     def training_step(self, batch, batch_idx, optimizer_idx):
-        # https://github.com/pytorch/pytorch/issues/37142
-        # try not to fool the heuristics
         x = self.get_input(batch, self.image_key)
         xrec, qloss = self(x)
 
@@ -88,28 +85,17 @@ class VQModel(pl.LightningModule):
             aeloss, log_dict_ae = self.loss(qloss, x, xrec, optimizer_idx, self.global_step,
                                             last_layer=self.get_last_layer(), split="train")
 
-            #self.log("train/aeloss", aeloss, prog_bar=True, logger=True, on_step=True, on_epoch=True)
+            self.log("train/aeloss", aeloss, prog_bar=True, logger=True, on_step=True, on_epoch=True)
             self.log_dict(log_dict_ae, prog_bar=False, logger=True, on_step=True, on_epoch=True)
             return aeloss
-            #output = pl.TrainResult(minimize=aeloss)
-            #output.log("train/aeloss", aeloss,
-            #           prog_bar=True, logger=True, on_step=True, on_epoch=True)
-            #output.log_dict(log_dict_ae, prog_bar=False, logger=True, on_step=True, on_epoch=True)
-            #return output
 
         if optimizer_idx == 1:
             # discriminator
             discloss, log_dict_disc = self.loss(qloss, x, xrec, optimizer_idx, self.global_step,
                                             last_layer=self.get_last_layer(), split="train")
-            #self.log("train/discloss", discloss, prog_bar=True, logger=True, on_step=True, on_epoch=True)
+            self.log("train/discloss", discloss, prog_bar=True, logger=True, on_step=True, on_epoch=True)
             self.log_dict(log_dict_disc, prog_bar=False, logger=True, on_step=True, on_epoch=True)
             return discloss
-            #return log_dict_disc
-            #output = pl.TrainResult(minimize=discloss)
-            #output.log("train/discloss", discloss,
-            #           prog_bar=True, logger=True, on_step=True, on_epoch=True)
-            #output.log_dict(log_dict_disc, prog_bar=False, logger=True, on_step=True, on_epoch=True)
-            #return output
 
     def validation_step(self, batch, batch_idx):
         x = self.get_input(batch, self.image_key)

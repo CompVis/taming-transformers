@@ -59,26 +59,17 @@ def run_conditional(model, dsets):
         dset = dsets.datasets[split]
     else:
         dset = next(iter(dsets.datasets.values()))
-    #st.sidebar.text(f"Dataset size: {len(dset)}")
-    #batch_size = st.sidebar.number_input("Batch size", min_value=1, value=1)
     batch_size = 1
-    start_index = st.sidebar.number_input("Example Index", value=0,
+    start_index = st.sidebar.number_input("Example Index (Size: {})".format(len(dset)), value=0,
                                           min_value=0,
                                           max_value=len(dset)-batch_size)
-    #if st.sidebar.button("Sample Batch"):
-    #    indices = np.random.choice(len(dset), batch_size)
-    #else:
-    #    indices = list(range(start_index, start_index+batch_size))
     indices = list(range(start_index, start_index+batch_size))
-    #st.sidebar.text(f"Indices: {list(indices)}")
 
     example = default_collate([dset[i] for i in indices])
+
     x = model.get_input("image", example).to(model.device)
-    #M = st.number_input("Pad to multiple of", value=1)
-    #x = pad_to_M(x, M)
-    #cond_key = st.selectbox("Conditioning Key", ("segmentation", "depth",
-    #                                             "low_res", "stickman", "lr", "coord"))
-    cond_key = "segmentation"
+
+    cond_key = model.cond_stage_key
     c = model.get_input(cond_key, example).to(model.device)
 
     scale_factor = st.sidebar.slider("Scale Factor", min_value=0.5, max_value=4.0, step=0.25, value=1.00)
@@ -92,9 +83,9 @@ def run_conditional(model, dsets):
     cshape = quant_z.shape
 
     xrec = model.first_stage_model.decode(quant_z)
-    st.write("Image: {}".format(x.shape))
+    st.write("image: {}".format(x.shape))
     st.image(bchw_to_st(x), clamp=True, output_format="PNG")
-    st.write("Reconstruction: {}".format(xrec.shape))
+    st.write("image reconstruction: {}".format(xrec.shape))
     st.image(bchw_to_st(xrec), clamp=True, output_format="PNG")
 
     if cond_key == "segmentation":
@@ -105,7 +96,7 @@ def run_conditional(model, dsets):
         c = c.squeeze(1).permute(0, 3, 1, 2).float()
         c = model.cond_stage_model.to_rgb(c)
 
-    st.write(f"Segmentation: {tuple(c.shape)}")
+    st.write(f"{cond_key}: {tuple(c.shape)}")
     st.image(bchw_to_st(c), clamp=True, output_format="PNG")
 
     idx = z_indices

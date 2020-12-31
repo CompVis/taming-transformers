@@ -25,17 +25,6 @@ conda activate taming
 
 ## Data Preparation
 
-### CelebA
-Create a symlink 'data/CelebA' pointing to a folder which contains the following files:
-```  
-.
-  ├── identity_CelebA.txt
-  ├── img_align_celeba
-  ├── list_attr_celeba.txt
-  └── list_eval_partition.txt
-```
-These files can be obtained [here](http://mmlab.ie.cuhk.edu.hk/projects/CelebA.html).
-
 ### CelebA-HQ
 Create a symlink `data/celebahq` pointing to a folder containing the `.npy`
 files of CelebA-HQ (instructions to obtain them can be found in the [PGGAN
@@ -51,9 +40,34 @@ from the [FFHQ repository](https://github.com/NVlabs/ffhq-dataset).
 ![teaser](assets/sunset_and_ocean.jpg)
 ![teaser](assets/lake_in_the_mountains.png)
 
-Download the [2020-11-09T13-31-51_sflckr](https://heibox.uni-heidelberg.de/d/73487ab6e5314cb5adba/) folder and place it into `logs`. Run
+Download the [2020-11-09T13-31-51_sflckr](https://heibox.uni-heidelberg.de/d/73487ab6e5314cb5adba/) folder and place it into `logs`. 
+Then, run
 ```
 streamlit run scripts/sample_conditional.py -- -r logs/2020-11-09T13-31-51_sflckr/
+```
+
+### FacesHQ
+Download [2020-11-09T13-31-51_sflckr](TODO) and place it into `logs`. Run
+```
+streamlit run scripts/sample_conditional.py -- -r logs/2020-11-13T21-41-45_faceshq_transformer/
+```
+
+## Training models
+
+### FacesHQ
+
+Train a VQGAN with
+```
+python main.py --base configs/faceshq_vqgan.yaml -t True --gpus 0,
+```
+
+Then, adjust the checkpoint path of the config key
+`model.params.first_stage_config.params.ckpt_path` in
+`configs/faceshq_transformer.yaml` (or download
+[2020-11-09T13-33-36_faceshq_vqgan](TODO) and place into `logs`, which
+corresponds to the preconfigured checkpoint path), then run
+```
+python main.py --base configs/faceshq_transformer.yaml -t True --gpus 0,
 ```
 
 ## Shout-outs
