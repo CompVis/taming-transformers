@@ -1,4 +1,5 @@
 # Taming Transformers for High-Resolution Image Synthesis
+![teaser](assets/mountain.jpeg)
 
 Code for
 
@@ -47,9 +48,12 @@ from the [FFHQ repository](https://github.com/NVlabs/ffhq-dataset).
 ## Running pretrained models
 
 ### S-FLCKR
-Download the [2020-11-09T13-31-51_sflckr](TODO) and place it into `logs`. Run
+![teaser](assets/sunset_and_ocean.jpg)
+![teaser](assets/lake_in_the_mountains.png)
+
+Download the [2020-11-09T13-31-51_sflckr](https://heibox.uni-heidelberg.de/d/73487ab6e5314cb5adba/) folder and place it into `logs`. Run
 ```
-streamlit run scripts/sample_conditional.py -- -r logs/TODO/
+streamlit run scripts/sample_conditional.py -- -r logs/2020-11-09T13-31-51_sflckr/
 ```
 
 ## Shout-outs
@@ -57,8 +61,7 @@ Thanks to everyone who makes their code and models available. In particular,
 
 - The architecture of our VQGAN is inspired by [Denoising Diffusion Probabilistic Models](https://github.com/hojonathanho/diffusion)
 - The very hackable transformer implementation [minGPT](https://github.com/karpathy/minGPT)
-- The good ol' [PatchGAN](https://github.com/junyanz/pytorch-CycleGAN-and-pix2pix)
-
+- The good ol' [PatchGAN](https://github.com/junyanz/pytorch-CycleGAN-and-pix2pix) and [Learned Perceptual Similarity (LPIPS)](https://github.com/richzhang/PerceptualSimilarity)
 
 ## BibTeX
 
