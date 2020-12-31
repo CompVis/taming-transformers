@@ -1,8 +1,6 @@
 # Taming Transformers for High-Resolution Image Synthesis
 ![teaser](assets/mountain.jpeg)
 
-Code for
-
 [**Taming Transformers for High-Resolution Image Synthesis**](https://compvis.github.io/taming-transformers/)<br/>
 [Patrick Esser](https://github.com/pesser)\*,
 [Robin Rombach](https://github.com/rromb)\*,
