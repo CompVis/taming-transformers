@@ -2,13 +2,13 @@
 Code for
 
 ![teaser](assets/mountain.jpeg)
-<p align="center">
+<div align="center">
 [**Taming Transformers for High-Resolution Image Synthesis**](https://compvis.github.io/taming-transformers/)<br/>
 [Patrick Esser](https://github.com/pesser)\*,
 [Robin Rombach](https://github.com/rromb)\*,
 [Björn Ommer](https://hci.iwr.uni-heidelberg.de/Staff/bommer)<br/>
 \* equal contribution
-</p>
+</div>
 
 **tl;dr** We combine the efficiancy of convolutional approaches with the expressivity of transformers by introducing a convolutional VQGAN, which learns a codebook of context-rich visual parts, whose composition is modeled with an autoregressive transformer.
 
