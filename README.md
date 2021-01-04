@@ -12,6 +12,10 @@
 ![teaser](assets/teaser.png)
 [arXiv](https://arxiv.org/abs/2012.09841) | [BibTeX](#bibtex) | [Project Page](https://compvis.github.io/taming-transformers/)
 
+### News
+
+- You can now jump right into sampling with our [Colab quickstart notebook](https://colab.research.google.com/github/CompVis/taming-transformers/blob/master/scripts/taming-transformers.ipynb).
+
 ## Requirements
 A suitable [conda](https://conda.io/) environment named `taming` can be created
 and activated with:
@@ -25,6 +29,10 @@ conda activate taming
 
 ### S-FLCKR
 ![teaser](assets/sunset_and_ocean.jpg)
+
+You can also [run this model in a Colab
+notebook](https://colab.research.google.com/github/CompVis/taming-transformers/blob/master/scripts/taming-transformers.ipynb),
+which includes all necessary steps to start sampling.
 
 Download the
 [2020-11-09T13-31-51_sflckr](https://heibox.uni-heidelberg.de/d/73487ab6e5314cb5adba/)
