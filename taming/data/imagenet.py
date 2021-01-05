@@ -374,6 +374,45 @@ class RINValidationWithDepth(ImageNetValidationWithDepth):
                          sub_indices=sub_indices, crop_size=crop_size)
 
 
+class DRINExamples(Dataset):
+    def __init__(self):
+        self.preprocessor = get_preprocessor(size=256, additional_targets={"depth": "image"})
+        with open("data/drin_examples.txt", "r") as f:
+            relpaths = f.read().splitlines()
+        self.image_paths = [os.path.join("data/drin_images",
+                                         relpath) for relpath in relpaths]
+        self.depth_paths = [os.path.join("data/drin_depth",
+                                         relpath.replace(".JPEG", ".png")) for relpath in relpaths]
+
+    def __len__(self):
+        return len(self.image_paths)
+
+    def preprocess_image(self, image_path):
+        image = Image.open(image_path)
+        if not image.mode == "RGB":
+            image = image.convert("RGB")
+        image = np.array(image).astype(np.uint8)
+        image = self.preprocessor(image=image)["image"]
+        image = (image/127.5 - 1.0).astype(np.float32)
+        return image
+
+    def preprocess_depth(self, path):
+        rgba = np.array(Image.open(path))
+        depth = rgba_to_depth(rgba)
+        depth = (depth - depth.min())/max(1e-8, depth.max()-depth.min())
+        depth = 2.0*depth-1.0
+        return depth
+
+    def __getitem__(self, i):
+        e = dict()
+        e["image"] = self.preprocess_image(self.image_paths[i])
+        e["depth"] = self.preprocess_depth(self.depth_paths[i])
+        transformed = self.preprocessor(image=e["image"], depth=e["depth"])
+        e["image"] = transformed["image"]
+        e["depth"] = transformed["depth"]
+        return e
+
+
 def imscale(x, factor, keepshapes=False, keepmode="bicubic"):
     if factor is None or factor==1:
         return x

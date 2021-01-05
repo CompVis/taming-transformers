@@ -220,6 +220,12 @@ def get_parser():
         const=True,
         default="",
     )
+    parser.add_argument(
+        "--ignore_base_data",
+        action="store_true",
+        help="Ignore data specification from base configs. Useful if you want "
+        "to specify a custom datasets on the command line.",
+    )
     return parser
 
 
@@ -315,6 +321,9 @@ if __name__ == "__main__":
 
     configs = [OmegaConf.load(cfg) for cfg in opt.base]
     cli = OmegaConf.from_dotlist(unknown)
+    if opt.ignore_base_data:
+        for config in configs:
+            if hasattr(config, "data"): del config["data"]
     config = OmegaConf.merge(*configs, cli)
 
     st.sidebar.text(ckpt)
