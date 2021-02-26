@@ -157,8 +157,8 @@ python main.py --base configs/faceshq_vqgan.yaml -t True --gpus 0,
 ```
 
 There are two classes in `taming/data/faceshq.py`. One called `CelebAHQ{split}` reads `.npy` files, the other called `FFHQ{split}` read images,
-where `{split}` is one of `train`/`validation`.
-In the same file, for class `FacesHQTrain` and `FacesHQValidation`, change `d1` or `d2` as the way you want to use.
+where `{split}` is one of `Train`/`Validation`.
+In the same file, for class `FacesHQTrain` and `FacesHQValidation`, change `d1` or `d2` as the way you want to use it.
 
 Then, adjust the checkpoint path of the config key
 `model.params.first_stage_config.params.ckpt_path` in
