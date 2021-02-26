@@ -169,7 +169,8 @@ corresponds to the preconfigured checkpoint path), then run
 python main.py --base configs/faceshq_transformer.yaml -t True --gpus 0,
 ```
 
-Run the code above will cause error: yaml.parser.ParserError: expected '<document start>', but found '<block mapping start>'
+Run the code above will cause error: yaml.parser.ParserError: 
+expected '<document start>', but found '<block mapping start>'
 
 Solution: Change to new `configs/faceshq_transformer.yaml`
 
