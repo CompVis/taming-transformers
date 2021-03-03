@@ -13,7 +13,7 @@
 [arXiv](https://arxiv.org/abs/2012.09841) | [BibTeX](#bibtex) | [Project Page](https://compvis.github.io/taming-transformers/)
 
 ### News
-- We added a [colab notebook](TODO) which compares two VQGANs and OpenAI's [DALL-E](). See also [this section](##more-resources).
+- We added a [colab notebook](https://colab.research.google.com/github/CompVis/taming-transformers/blob/master/scripts/reconstruction_usage.ipynb) which compares two VQGANs and OpenAI's [DALL-E](). See also [this section](##more-resources).
 - We now include an overview of pretrained models in [Tab.1](#overview-of-pretrained-models)
 - The streamlit demo now supports image completions.
 - We now include a couple of examples from the D-RIN dataset so you can run the
