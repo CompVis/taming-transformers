@@ -12,6 +12,13 @@
 ![teaser](assets/teaser.png)
 [arXiv](https://arxiv.org/abs/2012.09841) | [BibTeX](#bibtex) | [Project Page](https://compvis.github.io/taming-transformers/)
 
+### News
+
+- The streamlit demo now supports image completions.
+- We now include a couple of examples from the D-RIN dataset so you can run the
+  [D-RIN demo](#d-rin) without preparing the dataset first.
+- You can now jump right into sampling with our [Colab quickstart notebook](https://colab.research.google.com/github/CompVis/taming-transformers/blob/master/scripts/taming-transformers.ipynb).
+
 ## Requirements
 A suitable [conda](https://conda.io/) environment named `taming` can be created
 and activated with:
@@ -75,6 +82,64 @@ place it into `logs`. Follow the data preparation steps for
 [ImageNet](#imagenet). Run
 ```
 streamlit run scripts/sample_conditional.py -- -r logs/2020-11-20T12-54-32_drin_transformer/
+```
+
+## Running pretrained models
+
+The commands below will start a streamlit demo which supports sampling at
+different resolutions and image completions. To run a non-interactive version
+of the sampling process, replace `streamlit run scripts/sample_conditional.py --`
+by `python scripts/make_samples.py --outdir <path_to_write_samples_to>` and
+keep the remaining command line arguments.
+
+### S-FLCKR
+![teaser](assets/sunset_and_ocean.jpg)
+
+You can also [run this model in a Colab
+notebook](https://colab.research.google.com/github/CompVis/taming-transformers/blob/master/scripts/taming-transformers.ipynb),
+which includes all necessary steps to start sampling.
+
+Download the
+[2020-11-09T13-31-51_sflckr](https://heibox.uni-heidelberg.de/d/73487ab6e5314cb5adba/)
+folder and place it into `logs`. Then, run
+```
+streamlit run scripts/sample_conditional.py -- -r logs/2020-11-09T13-31-51_sflckr/
+```
+
+### FacesHQ
+![teaser](assets/faceshq.jpg)
+
+Download [2020-11-13T21-41-45_faceshq_transformer](https://k00.fr/qqfl2do8) and
+place it into `logs`. Follow the data preparation steps for
+[CelebA-HQ](#celeba-hq) and [FFHQ](#ffhq). Run
+```
+streamlit run scripts/sample_conditional.py -- -r logs/2020-11-13T21-41-45_faceshq_transformer/
+```
+
+### D-RIN
+![teaser](assets/drin.jpg)
+
+Download [2020-11-20T12-54-32_drin_transformer](https://k00.fr/39jcugc5) and
+place it into `logs`. To run the demo on a couple of example depth maps
+included in the repository, run
+
+```
+streamlit run scripts/sample_conditional.py -- -r logs/2020-11-20T12-54-32_drin_transformer/ --ignore_base_data data="{target: main.DataModuleFromConfig, params: {batch_size: 1, validation: {target: taming.data.imagenet.DRINExamples}}}"
+```
+
+To run the demo on the complete validation set, first follow the data preparation steps for
+[ImageNet](#imagenet) and then run
+```
+streamlit run scripts/sample_conditional.py -- -r logs/2020-11-20T12-54-32_drin_transformer/
+```
+
+### COCO
+Download [2021-01-20T16-04-20_coco_transformer](https://k00.fr/2zz6i2ce) and
+place it into `logs`. To run the demo on a couple of example segmentation maps
+included in the repository, run
+
+```
+streamlit run scripts/sample_conditional.py -- -r logs/2021-01-20T16-04-20_coco_transformer/ --ignore_base_data data="{target: main.DataModuleFromConfig, params: {batch_size: 1, validation: {target: taming.data.coco.Examples}}}"
 ```
 
 ## Data Preparation
@@ -153,6 +218,15 @@ trained on [COCO-Stuff](https://arxiv.org/abs/1612.03716). We used a [PyTorch
 reimplementation](https://github.com/kazuto1011/deeplab-pytorch) and include an
 example script for this process in `scripts/extract_segmentation.py`.
 
+### COCO
+Create a symlink `data/coco` containing the images from the 2017 split in
+`train2017` and `val2017`, and their annotations in `annotations`. Files can be
+obtained from the [COCO webpage](https://cocodataset.org/). In addition, we use
+the [Stuff+thing PNG-style annotations on COCO 2017
+trainval](http://calvin.inf.ed.ac.uk/wp-content/uploads/data/cocostuffdataset/stuffthingmaps_trainval2017.zip)
+annotations from [COCO-Stuff](https://github.com/nightrome/cocostuff), which
+should be placed under `data/cocostuffthings`.
+
 ## Training models
 
 ### FacesHQ
@@ -197,6 +271,14 @@ To train the transformer, run
 ```
 python main.py --base configs/drin_transformer.yaml -t True --gpus 0,
 ```
+
+## More Resources
+
+- A [video summary](https://www.youtube.com/watch?v=o7dqGcLDf0A&feature=emb_imp_woyt) by [Two Minute Papers](https://www.youtube.com/channel/UCbfYPyITQ-7l4upoX8nvctg).
+- A [weights and biases report summarizing the paper](https://wandb.ai/ayush-thakur/taming-transformer/reports/-Overview-Taming-Transformers-for-High-Resolution-Image-Synthesis---Vmlldzo0NjEyMTY)
+by [ayulockin](https://github.com/ayulockin).
+- A [video summary](https://www.youtube.com/watch?v=JfUTd8fjtX8&feature=emb_imp_woyt) by [What's AI](https://www.youtube.com/channel/UCUzGQrN-lyyc0BWTYoJM_Sg).
+- Take a look at [ak9250's notebook](https://github.com/ak9250/taming-transformers/blob/master/tamingtransformerscolab.ipynb) if you want to run the streamlit demos on Colab.
 
 ## Shout-outs
 Thanks to everyone who makes their code and models available. In particular,

@@ -2,144 +2,77 @@ import argparse, os, sys, glob, math, time
 import torch
 import numpy as np
 from omegaconf import OmegaConf
-import streamlit as st
-from streamlit import caching
 from PIL import Image
 from main import instantiate_from_config, DataModuleFromConfig
 from torch.utils.data import DataLoader
 from torch.utils.data.dataloader import default_collate
+from tqdm import trange
 
 
-rescale = lambda x: (x + 1.) / 2.
+def save_image(x, path):
+    c,h,w = x.shape
+    assert c==3
+    x = ((x.detach().cpu().numpy().transpose(1,2,0)+1.0)*127.5).clip(0,255).astype(np.uint8)
+    Image.fromarray(x).save(path)
 
-
-def bchw_to_st(x):
-    return rescale(x.detach().cpu().numpy().transpose(0,2,3,1))
-
-def save_img(xstart, fname):
-    I = (xstart.clip(0,1)[0]*255).astype(np.uint8)
-    Image.fromarray(I).save(fname)
-
-
-
-def get_interactive_image(resize=False):
-    image = st.file_uploader("Input", type=["jpg", "JPEG", "png"])
-    if image is not None:
-        image = Image.open(image)
-        if not image.mode == "RGB":
-            image = image.convert("RGB")
-        image = np.array(image).astype(np.uint8)
-        print("upload image shape: {}".format(image.shape))
-        img = Image.fromarray(image)
-        if resize:
-            img = img.resize((256, 256))
-        image = np.array(img)
-        return image
-
-
-def single_image_to_torch(x, permute=True):
-    assert x is not None, "Please provide an image through the upload function"
-    x = np.array(x)
-    x = torch.FloatTensor(x/255.*2. - 1.)[None,...]
-    if permute:
-        x = x.permute(0, 3, 1, 2)
-    return x
-
-
-def pad_to_M(x, M):
-    hp = math.ceil(x.shape[2]/M)*M-x.shape[2]
-    wp = math.ceil(x.shape[3]/M)*M-x.shape[3]
-    x = torch.nn.functional.pad(x, (0,wp,0,hp,0,0,0,0))
-    return x
 
 @torch.no_grad()
-def run_conditional(model, dsets):
+def run_conditional(model, dsets, outdir, top_k, temperature, batch_size=1):
     if len(dsets.datasets) > 1:
-        split = st.sidebar.radio("Split", sorted(dsets.datasets.keys()))
+        split = sorted(dsets.datasets.keys())[0]
         dset = dsets.datasets[split]
     else:
         dset = next(iter(dsets.datasets.values()))
-    batch_size = 1
-    start_index = st.sidebar.number_input("Example Index (Size: {})".format(len(dset)), value=0,
-                                          min_value=0,
-                                          max_value=len(dset)-batch_size)
-    indices = list(range(start_index, start_index+batch_size))
+    print("Dataset: ", dset.__class__.__name__)
+    for start_idx in trange(0,len(dset)-batch_size+1,batch_size):
+        indices = list(range(start_idx, start_idx+batch_size))
+        example = default_collate([dset[i] for i in indices])
 
-    example = default_collate([dset[i] for i in indices])
+        x = model.get_input("image", example).to(model.device)
+        for i in range(x.shape[0]):
+            save_image(x[i], os.path.join(outdir, "originals",
+                                          "{:06}.png".format(indices[i])))
 
-    x = model.get_input("image", example).to(model.device)
+        cond_key = model.cond_stage_key
+        c = model.get_input(cond_key, example).to(model.device)
 
-    cond_key = model.cond_stage_key
-    c = model.get_input(cond_key, example).to(model.device)
+        scale_factor = 1.0
+        quant_z, z_indices = model.encode_to_z(x)
+        quant_c, c_indices = model.encode_to_c(c)
 
-    scale_factor = st.sidebar.slider("Scale Factor", min_value=0.5, max_value=4.0, step=0.25, value=1.00)
-    if scale_factor != 1.0:
-        x = torch.nn.functional.interpolate(x, scale_factor=scale_factor, mode="bicubic")
-        c = torch.nn.functional.interpolate(c, scale_factor=scale_factor, mode="bicubic")
+        cshape = quant_z.shape
 
-    quant_z, z_indices = model.encode_to_z(x)
-    quant_c, c_indices = model.encode_to_c(c)
+        xrec = model.first_stage_model.decode(quant_z)
+        for i in range(xrec.shape[0]):
+            save_image(xrec[i], os.path.join(outdir, "reconstructions",
+                                             "{:06}.png".format(indices[i])))
 
-    cshape = quant_z.shape
+        if cond_key == "segmentation":
+            # get image from segmentation mask
+            num_classes = c.shape[1]
+            c = torch.argmax(c, dim=1, keepdim=True)
+            c = torch.nn.functional.one_hot(c, num_classes=num_classes)
+            c = c.squeeze(1).permute(0, 3, 1, 2).float()
+            c = model.cond_stage_model.to_rgb(c)
 
-    xrec = model.first_stage_model.decode(quant_z)
-    st.write("image: {}".format(x.shape))
-    st.image(bchw_to_st(x), clamp=True, output_format="PNG")
-    st.write("image reconstruction: {}".format(xrec.shape))
-    st.image(bchw_to_st(xrec), clamp=True, output_format="PNG")
+        idx = z_indices
 
-    if cond_key == "segmentation":
-        # get image from segmentation mask
-        num_classes = c.shape[1]
-        c = torch.argmax(c, dim=1, keepdim=True)
-        c = torch.nn.functional.one_hot(c, num_classes=num_classes)
-        c = c.squeeze(1).permute(0, 3, 1, 2).float()
-        c = model.cond_stage_model.to_rgb(c)
+        half_sample = False
+        if half_sample:
+            start = idx.shape[1]//2
+        else:
+            start = 0
 
-    st.write(f"{cond_key}: {tuple(c.shape)}")
-    st.image(bchw_to_st(c), clamp=True, output_format="PNG")
+        idx[:,start:] = 0
+        idx = idx.reshape(cshape[0],cshape[2],cshape[3])
+        start_i = start//cshape[3]
+        start_j = start %cshape[3]
 
-    idx = z_indices
+        cidx = c_indices
+        cidx = cidx.reshape(quant_c.shape[0],quant_c.shape[2],quant_c.shape[3])
 
-    half_sample = st.sidebar.checkbox("Image Completion", value=False)
-    if half_sample:
-        start = idx.shape[1]//2
-    else:
-        start = 0
+        sample = True
 
-    idx[:,start:] = 0
-    idx = idx.reshape(cshape[0],cshape[2],cshape[3])
-    start_i = start//cshape[3]
-    start_j = start %cshape[3]
-
-    if not half_sample and quant_z.shape == quant_c.shape:
-        st.info("Setting idx to c_indices")
-        idx = c_indices.clone().reshape(cshape[0],cshape[2],cshape[3])
-
-    cidx = c_indices
-    cidx = cidx.reshape(quant_c.shape[0],quant_c.shape[2],quant_c.shape[3])
-
-    xstart = model.decode_to_img(idx[:,:cshape[2],:cshape[3]], cshape)
-    st.image(bchw_to_st(xstart), clamp=True, output_format="PNG")
-
-    temperature = st.number_input("Temperature", value=1.0)
-    top_k = st.number_input("Top k", value=100)
-    sample = st.checkbox("Sample", value=True)
-    update_every = st.number_input("Update every", value=75)
-
-    st.text(f"Sampling shape ({cshape[2]},{cshape[3]})")
-
-    animate = st.checkbox("animate")
-    if animate:
-        import imageio
-        outvid = "sampling.mp4"
-        writer = imageio.get_writer(outvid, fps=25)
-    elapsed_t = st.empty()
-    info = st.empty()
-    st.text("Sampled")
-    if st.button("Sample"):
-        output = st.empty()
-        start_t = time.time()
         for i in range(start_i,cshape[2]-0):
             if i <= 8:
                 local_i = i
@@ -159,8 +92,6 @@ def run_conditional(model, dsets):
                 i_end = i_start+16
                 j_start = j-local_j
                 j_end = j_start+16
-                elapsed_t.text(f"Time: {time.time() - start_t} seconds")
-                info.text(f"Step: ({i},{j}) | Local: ({local_i},{local_j}) | Crop: ({i_start}:{i_end},{j_start}:{j_end})")
                 patch = idx[:,i_start:i_end,j_start:j_end]
                 patch = patch.reshape(patch.shape[0],-1)
                 cpatch = cidx[:, i_start:i_end, j_start:j_end]
@@ -184,22 +115,10 @@ def run_conditional(model, dsets):
                     _, ix = torch.topk(probs, k=1, dim=-1)
                 idx[:,i,j] = ix
 
-                if (i*cshape[3]+j)%update_every==0:
-                    xstart = model.decode_to_img(idx[:, :cshape[2], :cshape[3]], cshape,)
-
-                    xstart = bchw_to_st(xstart)
-                    output.image(xstart, clamp=True, output_format="PNG")
-
-                    if animate:
-                        writer.append_data((xstart[0]*255).clip(0, 255).astype(np.uint8))
-
-        xstart = model.decode_to_img(idx[:,:cshape[2],:cshape[3]], cshape)
-        xstart = bchw_to_st(xstart)
-        output.image(xstart, clamp=True, output_format="PNG")
-        #save_img(xstart, "full_res_sample.png")
-        if animate:
-            writer.close()
-            st.video(outvid)
+        xsample = model.decode_to_img(idx[:,:cshape[2],:cshape[3]], cshape)
+        for i in range(xsample.shape[0]):
+            save_image(xsample[i], os.path.join(outdir, "samples",
+                                                "{:06}.png".format(indices[i])))
 
 
 def get_parser():
@@ -236,32 +155,50 @@ def get_parser():
         help="Ignore data specification from base configs. Useful if you want "
         "to specify a custom datasets on the command line.",
     )
+    parser.add_argument(
+        "--outdir",
+        required=True,
+        type=str,
+        help="Where to write outputs to.",
+    )
+    parser.add_argument(
+        "--top_k",
+        type=int,
+        default=100,
+        help="Sample from among top-k predictions.",
+    )
+    parser.add_argument(
+        "--temperature",
+        type=float,
+        default=1.0,
+        help="Sampling temperature.",
+    )
     return parser
 
 
 def load_model_from_config(config, sd, gpu=True, eval_mode=True):
     if "ckpt_path" in config.params:
-        st.warning("Deleting the restore-ckpt path from the config...")
+        print("Deleting the restore-ckpt path from the config...")
         config.params.ckpt_path = None
     if "downsample_cond_size" in config.params:
-        st.warning("Deleting downsample-cond-size from the config and setting factor=0.5 instead...")
+        print("Deleting downsample-cond-size from the config and setting factor=0.5 instead...")
         config.params.downsample_cond_size = -1
         config.params["downsample_cond_factor"] = 0.5
     try:
         if "ckpt_path" in config.params.first_stage_config.params:
             config.params.first_stage_config.params.ckpt_path = None
-            st.warning("Deleting the first-stage restore-ckpt path from the config...")
+            print("Deleting the first-stage restore-ckpt path from the config...")
         if "ckpt_path" in config.params.cond_stage_config.params:
             config.params.cond_stage_config.params.ckpt_path = None
-            st.warning("Deleting the cond-stage restore-ckpt path from the config...")
+            print("Deleting the cond-stage restore-ckpt path from the config...")
     except:
         pass
 
     model = instantiate_from_config(config)
     if sd is not None:
         missing, unexpected = model.load_state_dict(sd, strict=False)
-        st.info(f"Missing Keys in State Dict: {missing}")
-        st.info(f"Unexpected Keys in State Dict: {unexpected}")
+        print(f"Missing Keys in State Dict: {missing}")
+        print(f"Unexpected Keys in State Dict: {unexpected}")
     if gpu:
         model.cuda()
     if eval_mode:
@@ -277,7 +214,6 @@ def get_data(config):
     return data
 
 
-@st.cache(allow_output_mutation=True, suppress_st_warning=True)
 def load_model_and_dset(config, ckpt, gpu, eval_mode):
     # get data
     dsets = get_data(config)   # calls data.config ...
@@ -336,20 +272,21 @@ if __name__ == "__main__":
             if hasattr(config, "data"): del config["data"]
     config = OmegaConf.merge(*configs, cli)
 
-    st.sidebar.text(ckpt)
-    gs = st.sidebar.empty()
-    gs.text(f"Global step: ?")
-    st.sidebar.text("Options")
-    #gpu = st.sidebar.checkbox("GPU", value=True)
+    print(ckpt)
     gpu = True
-    #eval_mode = st.sidebar.checkbox("Eval Mode", value=True)
     eval_mode = True
-    #show_config = st.sidebar.checkbox("Show Config", value=False)
     show_config = False
     if show_config:
-        st.info("Checkpoint: {}".format(ckpt))
-        st.json(OmegaConf.to_container(config))
+        print(OmegaConf.to_container(config))
 
     dsets, model, global_step = load_model_and_dset(config, ckpt, gpu, eval_mode)
-    gs.text(f"Global step: {global_step}")
-    run_conditional(model, dsets)
+    print(f"Global step: {global_step}")
+
+    outdir = os.path.join(opt.outdir, "{:06}_{}_{}".format(global_step,
+                                                           opt.top_k,
+                                                           opt.temperature))
+    os.makedirs(outdir, exist_ok=True)
+    print("Writing samples to ", outdir)
+    for k in ["originals", "reconstructions", "samples"]:
+        os.makedirs(os.path.join(outdir, k), exist_ok=True)
+    run_conditional(model, dsets, outdir, opt.top_k, opt.temperature)
