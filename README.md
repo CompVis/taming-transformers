@@ -27,6 +27,62 @@ and activated with:
 conda env create -f environment.yaml
 conda activate taming
 ```
+## Overview of pretrained models
+The following table provides an overview of all models that are currently available.
+
+| Dataset  | FID (*) | Link |  Samples (256x256) |
+| ------------- | ------------- |-------------  | -------------  |
+| FFHQ (f=16) | 11.4 | x | [50k]
+| CelebA-HQ (f=16) | 10.7 | x | [50k]
+| ADE20K (f=16) | 35.5  |  | [ade20k_samples.zip](https://heibox.uni-heidelberg.de/f/70bb78cbaf844501b8fb/) [2k]
+| COCO-Stuff (f=16) | 20.4  | [coco_transformer](https://k00.fr/2zz6i2ce) | [coco_samples.zip](https://heibox.uni-heidelberg.de/f/a395a9be612f4a7a8054/) [5k]
+| ImageNet (cIN) (f=16) | -- | coming soon...
+| FacesHQ (f=16) | -- | [2020-11-13T21-41-45_faceshq_transformer](https://k00.fr/qqfl2do8)
+| S-FLCKR (f=16) | -- | [2020-11-09T13-31-51_sflckr](https://heibox.uni-heidelberg.de/d/73487ab6e5314cb5adba/) 
+| D-RIN (f=16) | -- | [2020-11-20T12-54-32_drin_transformer](https://k00.fr/39jcugc5)
+| |  | | || |
+| VQGAN ImageNet (f=16), 1024| 8.0 (**) | [vqgan_imagenet_f16_1024](https://heibox.uni-heidelberg.de/d/8088892a516d4e3baf92/) | check out the [colab notebook](TODO)
+| VQGAN ImageNet (f=16), 16384| 4.9 (**) |[vqgan_imagenet_f16_16384](https://heibox.uni-heidelberg.de/d/a7530b09fed84f80a887/)  | check out the [colab notebook](TODO)
+| |  | | || |
+| DALL-E VQVAE(***) (f=8), 8192, GumbelQuantization| 34.3 (**) | https://github.com/openai/DALL-E | check out the [colab notebook](TODO)
+
+(*): FID scores were evaluated using [torch-fidelity](https://github.com/toshas/torch-fidelity) and without rejection sampling.
+
+(**): Denotes Reconstruction-FIDs evaluated against the validation split of ImageNet on 256x256 images.
+
+(***): For reference, we also include a link to the recently released autoencoder of the [DALL-E]() model. 
+See the corresponding [colab notebook](todo) for a comparison and discussion of reconstruction capabilities. 
+## Running pretrained models via streamlit
+
+### S-FLCKR
+![teaser](assets/sunset_and_ocean.jpg)
+
+Download the
+[2020-11-09T13-31-51_sflckr](https://heibox.uni-heidelberg.de/d/73487ab6e5314cb5adba/)
+folder and place it into `logs`. Then, run
+```
+streamlit run scripts/sample_conditional.py -- -r logs/2020-11-09T13-31-51_sflckr/
+```
+
+### FacesHQ
+![teaser](assets/faceshq.jpg)
+
+Download [2020-11-13T21-41-45_faceshq_transformer](https://k00.fr/qqfl2do8) and
+place it into `logs`. Follow the data preparation steps for
+[CelebA-HQ](#celeba-hq) and [FFHQ](#ffhq). Run
+```
+streamlit run scripts/sample_conditional.py -- -r logs/2020-11-13T21-41-45_faceshq_transformer/
+```
+
+### D-RIN
+![teaser](assets/drin.jpg)
+
+Download [2020-11-20T12-54-32_drin_transformer](https://k00.fr/39jcugc5) and
+place it into `logs`. Follow the data preparation steps for
+[ImageNet](#imagenet). Run
+```
+streamlit run scripts/sample_conditional.py -- -r logs/2020-11-20T12-54-32_drin_transformer/
+```
 
 ## Running pretrained models
 
