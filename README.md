@@ -38,7 +38,7 @@ See the corresponding [colab notebook](todo) for a comparison and discussion of 
 | ------------- | ------------- |-------------  | -------------  |-------------  |
 | FFHQ (f=16) | 11.4 | coming soon... | 
 | CelebA-HQ (f=16) | 10.7 | coming soon... | 
-| ADE20K (f=16) | 35.5  | TODO | [ade20k_samples.zip](https://heibox.uni-heidelberg.de/f/70bb78cbaf844501b8fb/) [2k]
+| ADE20K (f=16) | 35.5  | [ade20k_transformer](https://k00.fr/ot46cksa) | [ade20k_samples.zip](https://heibox.uni-heidelberg.de/f/70bb78cbaf844501b8fb/) [2k]
 | COCO-Stuff (f=16) | 20.4  | [coco_transformer](https://k00.fr/2zz6i2ce) | [coco_samples.zip](https://heibox.uni-heidelberg.de/f/a395a9be612f4a7a8054/) [5k]
 | ImageNet (cIN) (f=16) |  | coming soon...
 | |  | | || |
@@ -46,10 +46,10 @@ See the corresponding [colab notebook](todo) for a comparison and discussion of 
 | S-FLCKR (f=16) | -- | [sflckr](https://heibox.uni-heidelberg.de/d/73487ab6e5314cb5adba/) 
 | D-RIN (f=16) | -- | [drin_transformer](https://k00.fr/39jcugc5)
 | |  | | || |
-| VQGAN ImageNet (f=16), 1024| 8.0 | [vqgan_imagenet_f16_1024](https://heibox.uni-heidelberg.de/d/8088892a516d4e3baf92/) | TODO | Reconstruction-FIDs evaluated against the validation split of ImageNet on 256x256 images. Check out the [colab notebook](TODO)
-| VQGAN ImageNet (f=16), 16384| 4.9 |[vqgan_imagenet_f16_16384](https://heibox.uni-heidelberg.de/d/a7530b09fed84f80a887/)  |  TODO | Reconstruction-FIDs evaluated against the validation split of ImageNet on 256x256 images. Check out the [colab notebook](TODO)
+| VQGAN ImageNet (f=16), 1024| 8.0 | [vqgan_imagenet_f16_1024](https://heibox.uni-heidelberg.de/d/8088892a516d4e3baf92/) | TODO | Reconstruction-FIDs evaluated against the validation split of ImageNet on 256x256 images. Check out the [colab notebook](https://colab.research.google.com/github/CompVis/taming-transformers/blob/master/scripts/reconstruction_usage.ipynb)
+| VQGAN ImageNet (f=16), 16384| 4.9 |[vqgan_imagenet_f16_16384](https://heibox.uni-heidelberg.de/d/a7530b09fed84f80a887/)  |  TODO | Reconstruction-FIDs evaluated against the validation split of ImageNet on 256x256 images. Check out the [colab notebook](https://colab.research.google.com/github/CompVis/taming-transformers/blob/master/scripts/reconstruction_usage.ipynb)
 | |  | | || |
-| DALL-E VQVA (f=8), 8192, GumbelQuantization| 34.3 | https://github.com/openai/DALL-E | TODO | Reconstruction-FIDs evaluated against the validation split of ImageNet on 256x256 images. Check out the [colab notebook](TODO)
+| DALL-E VQVA (f=8), 8192, GumbelQuantization| 34.3 | https://github.com/openai/DALL-E | TODO | Reconstruction-FIDs evaluated against the validation split of ImageNet on 256x256 images. Check out the [colab notebook](https://colab.research.google.com/github/CompVis/taming-transformers/blob/master/scripts/reconstruction_usage.ipynb)
 
 
 ## Running pretrained models
@@ -108,6 +108,15 @@ included in the repository, run
 
 ```
 streamlit run scripts/sample_conditional.py -- -r logs/2021-01-20T16-04-20_coco_transformer/ --ignore_base_data data="{target: main.DataModuleFromConfig, params: {batch_size: 1, validation: {target: taming.data.coco.Examples}}}"
+```
+
+### ADE20k
+Download [2020-11-20T21-45-44_ade20k_transformer](https://k00.fr/ot46cksa) and
+place it into `logs`. To run the demo on a couple of example segmentation maps
+included in the repository, run
+
+```
+streamlit run scripts/sample_conditional.py -- -r logs/2020-11-20T21-45-44_ade20k_transformer/ --ignore_base_data data="{target: main.DataModuleFromConfig, params: {batch_size: 1, validation: {target: taming.data.ade20k.Examples}}}"
 ```
 
 ## Data Preparation
@@ -195,6 +204,11 @@ trainval](http://calvin.inf.ed.ac.uk/wp-content/uploads/data/cocostuffdataset/st
 annotations from [COCO-Stuff](https://github.com/nightrome/cocostuff), which
 should be placed under `data/cocostuffthings`.
 
+### ADE20k
+Create a symlink `data/ade20k_root` containing the contents of
+[ADEChallengeData2016.zip](http://data.csail.mit.edu/places/ADEchallenge/ADEChallengeData2016.zip)
+from the [MIT Scene Parsing Benchmark](http://sceneparsing.csail.mit.edu/).
+
 ## Training models
 
 ### FacesHQ
@@ -242,7 +256,7 @@ python main.py --base configs/drin_transformer.yaml -t True --gpus 0,
 
 ## More Resources
 ### Comparing Different First Stage Models
-The reconstruction and compression capabilities of different fist stage models can be analyzed in this [colab notebook](TODO). 
+The reconstruction and compression capabilities of different fist stage models can be analyzed in this [colab notebook](https://colab.research.google.com/github/CompVis/taming-transformers/blob/master/scripts/reconstruction_usage.ipynb). 
 In particular, the notebook compares two VQGANs (with a downsampling factor of f=16 for each and codebook dimensionality of 1024 and 16384) and 
 the discrete autoencoder of OpenAI's [DALL-E](https://github.com/openai/DALL-E) (which has f=8).
 ![firststages](assets/first_stage_squirrels.png)
