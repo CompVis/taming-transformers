@@ -37,7 +37,7 @@ See the corresponding [colab notebook](todo) for a comparison and discussion of 
 | ------------- | ------------- |-------------  | -------------  |-------------  |
 | FFHQ (f=16) | 11.4 | coming soon... | 
 | CelebA-HQ (f=16) | 10.7 | coming soon... | 
-| ADE20K (f=16) | 35.5  | TODO | [ade20k_samples.zip](https://heibox.uni-heidelberg.de/f/70bb78cbaf844501b8fb/) [2k]
+| ADE20K (f=16) | 35.5  | [ade20k_transformer](https://k00.fr/ot46cksa) | [ade20k_samples.zip](https://heibox.uni-heidelberg.de/f/70bb78cbaf844501b8fb/) [2k]
 | COCO-Stuff (f=16) | 20.4  | [coco_transformer](https://k00.fr/2zz6i2ce) | [coco_samples.zip](https://heibox.uni-heidelberg.de/f/a395a9be612f4a7a8054/) [5k]
 | ImageNet (cIN) (f=16) |  | coming soon...
 | |  | | || |
