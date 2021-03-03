@@ -14,10 +14,10 @@
 
 ### News
 
+- The streamlit demo now supports image completions.
 - We now include a couple of examples from the D-RIN dataset so you can run the
   [D-RIN demo](#d-rin) without preparing the dataset first.
 - You can now jump right into sampling with our [Colab quickstart notebook](https://colab.research.google.com/github/CompVis/taming-transformers/blob/master/scripts/taming-transformers.ipynb).
-- Take a look at [ak9250's notebook](https://github.com/ak9250/taming-transformers/blob/master/tamingtransformerscolab.ipynb) if you want to run the streamlit demos on Colab.
 
 ## Requirements
 A suitable [conda](https://conda.io/) environment named `taming` can be created
@@ -191,6 +191,14 @@ To train the transformer, run
 ```
 python main.py --base configs/drin_transformer.yaml -t True --gpus 0,
 ```
+
+## More Resources
+
+- A [video summary](https://www.youtube.com/watch?v=o7dqGcLDf0A&feature=emb_imp_woyt) by [Two Minute Papers](https://www.youtube.com/channel/UCbfYPyITQ-7l4upoX8nvctg).
+- A [weights and biases report summarizing the paper](https://wandb.ai/ayush-thakur/taming-transformer/reports/-Overview-Taming-Transformers-for-High-Resolution-Image-Synthesis---Vmlldzo0NjEyMTY)
+- A [video summary](https://www.youtube.com/watch?v=JfUTd8fjtX8&feature=emb_imp_woyt) by [What's AI](https://www.youtube.com/channel/UCUzGQrN-lyyc0BWTYoJM_Sg).
+by [ayulockin](https://github.com/ayulockin).
+- Take a look at [ak9250's notebook](https://github.com/ak9250/taming-transformers/blob/master/tamingtransformerscolab.ipynb) if you want to run the streamlit demos on Colab.
 
 ## Shout-outs
 Thanks to everyone who makes their code and models available. In particular,
