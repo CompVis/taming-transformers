@@ -28,61 +28,28 @@ conda env create -f environment.yaml
 conda activate taming
 ```
 ## Overview of pretrained models
-The following table provides an overview of all models that are currently available.
+The following table provides an overview of all models that are currently available. 
+FID scores were evaluated using [torch-fidelity](https://github.com/toshas/torch-fidelity) and without rejection sampling.
+For reference, we also include a link to the recently released autoencoder of the [DALL-E]() model. 
+See the corresponding [colab notebook](todo) for a comparison and discussion of reconstruction capabilities.
 
-| Dataset  | FID (*) | Link |  Samples (256x256) |
-| ------------- | ------------- |-------------  | -------------  |
-| FFHQ (f=16) | 11.4 | x | [50k]
-| CelebA-HQ (f=16) | 10.7 | x | [50k]
-| ADE20K (f=16) | 35.5  |  | [ade20k_samples.zip](https://heibox.uni-heidelberg.de/f/70bb78cbaf844501b8fb/) [2k]
+| Dataset  | FID | Link |  Samples (256x256) | Comments
+| ------------- | ------------- |-------------  | -------------  |-------------  |
+| FFHQ (f=16) | 11.4 | coming soon... | 
+| CelebA-HQ (f=16) | 10.7 | coming soon... | 
+| ADE20K (f=16) | 35.5  | TODO | [ade20k_samples.zip](https://heibox.uni-heidelberg.de/f/70bb78cbaf844501b8fb/) [2k]
 | COCO-Stuff (f=16) | 20.4  | [coco_transformer](https://k00.fr/2zz6i2ce) | [coco_samples.zip](https://heibox.uni-heidelberg.de/f/a395a9be612f4a7a8054/) [5k]
-| ImageNet (cIN) (f=16) | -- | coming soon...
-| FacesHQ (f=16) | -- | [2020-11-13T21-41-45_faceshq_transformer](https://k00.fr/qqfl2do8)
-| S-FLCKR (f=16) | -- | [2020-11-09T13-31-51_sflckr](https://heibox.uni-heidelberg.de/d/73487ab6e5314cb5adba/) 
-| D-RIN (f=16) | -- | [2020-11-20T12-54-32_drin_transformer](https://k00.fr/39jcugc5)
+| ImageNet (cIN) (f=16) |  | coming soon...
 | |  | | || |
-| VQGAN ImageNet (f=16), 1024| 8.0 (**) | [vqgan_imagenet_f16_1024](https://heibox.uni-heidelberg.de/d/8088892a516d4e3baf92/) | check out the [colab notebook](TODO)
-| VQGAN ImageNet (f=16), 16384| 4.9 (**) |[vqgan_imagenet_f16_16384](https://heibox.uni-heidelberg.de/d/a7530b09fed84f80a887/)  | check out the [colab notebook](TODO)
+| FacesHQ (f=16) | -- | [faceshq_transformer](https://k00.fr/qqfl2do8)
+| S-FLCKR (f=16) | -- | [sflckr](https://heibox.uni-heidelberg.de/d/73487ab6e5314cb5adba/) 
+| D-RIN (f=16) | -- | [drin_transformer](https://k00.fr/39jcugc5)
 | |  | | || |
-| DALL-E VQVAE(***) (f=8), 8192, GumbelQuantization| 34.3 (**) | https://github.com/openai/DALL-E | check out the [colab notebook](TODO)
+| VQGAN ImageNet (f=16), 1024| 8.0 | [vqgan_imagenet_f16_1024](https://heibox.uni-heidelberg.de/d/8088892a516d4e3baf92/) | TODO | Reconstruction-FIDs evaluated against the validation split of ImageNet on 256x256 images. Check out the [colab notebook](TODO)
+| VQGAN ImageNet (f=16), 16384| 4.9 |[vqgan_imagenet_f16_16384](https://heibox.uni-heidelberg.de/d/a7530b09fed84f80a887/)  |  TODO | Reconstruction-FIDs evaluated against the validation split of ImageNet on 256x256 images. Check out the [colab notebook](TODO)
+| |  | | || |
+| DALL-E VQVA (f=8), 8192, GumbelQuantization| 34.3 | https://github.com/openai/DALL-E | TODO | Reconstruction-FIDs evaluated against the validation split of ImageNet on 256x256 images. Check out the [colab notebook](TODO)
 
-(*): FID scores were evaluated using [torch-fidelity](https://github.com/toshas/torch-fidelity) and without rejection sampling.
-
-(**): Denotes Reconstruction-FIDs evaluated against the validation split of ImageNet on 256x256 images.
-
-(***): For reference, we also include a link to the recently released autoencoder of the [DALL-E]() model. 
-See the corresponding [colab notebook](todo) for a comparison and discussion of reconstruction capabilities. 
-## Running pretrained models via streamlit
-
-### S-FLCKR
-![teaser](assets/sunset_and_ocean.jpg)
-
-Download the
-[2020-11-09T13-31-51_sflckr](https://heibox.uni-heidelberg.de/d/73487ab6e5314cb5adba/)
-folder and place it into `logs`. Then, run
-```
-streamlit run scripts/sample_conditional.py -- -r logs/2020-11-09T13-31-51_sflckr/
-```
-
-### FacesHQ
-![teaser](assets/faceshq.jpg)
-
-Download [2020-11-13T21-41-45_faceshq_transformer](https://k00.fr/qqfl2do8) and
-place it into `logs`. Follow the data preparation steps for
-[CelebA-HQ](#celeba-hq) and [FFHQ](#ffhq). Run
-```
-streamlit run scripts/sample_conditional.py -- -r logs/2020-11-13T21-41-45_faceshq_transformer/
-```
-
-### D-RIN
-![teaser](assets/drin.jpg)
-
-Download [2020-11-20T12-54-32_drin_transformer](https://k00.fr/39jcugc5) and
-place it into `logs`. Follow the data preparation steps for
-[ImageNet](#imagenet). Run
-```
-streamlit run scripts/sample_conditional.py -- -r logs/2020-11-20T12-54-32_drin_transformer/
-```
 
 ## Running pretrained models
 
@@ -273,7 +240,13 @@ python main.py --base configs/drin_transformer.yaml -t True --gpus 0,
 ```
 
 ## More Resources
+### Comparing Different First Stage Models
+The reconstruction and compression capabilities of different fist stage models can be analyzed in this [colab notebook](TODO). 
+In particular, the notebook compares two VQGANs (with a downsampling factor of f=16 for each and codebook dimensionality of 1024 and 16384) and 
+the discrete autoencoder of OpenAI's [DALL-E](https://github.com/openai/DALL-E) (which has f=8).
+![firststages](assets/first_stage_squirrels.png)
 
+### Other
 - A [video summary](https://www.youtube.com/watch?v=o7dqGcLDf0A&feature=emb_imp_woyt) by [Two Minute Papers](https://www.youtube.com/channel/UCbfYPyITQ-7l4upoX8nvctg).
 - A [weights and biases report summarizing the paper](https://wandb.ai/ayush-thakur/taming-transformer/reports/-Overview-Taming-Transformers-for-High-Resolution-Image-Synthesis---Vmlldzo0NjEyMTY)
 by [ayulockin](https://github.com/ayulockin).
