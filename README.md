@@ -13,7 +13,7 @@
 [arXiv](https://arxiv.org/abs/2012.09841) | [BibTeX](#bibtex) | [Project Page](https://compvis.github.io/taming-transformers/)
 
 ### News
-- We added a [colab notebook](https://colab.research.google.com/github/CompVis/taming-transformers/blob/master/scripts/reconstruction_usage.ipynb) which compares two VQGANs and OpenAI's [DALL-E](). See also [this section](#more-resources).
+- We added a [colab notebook](https://colab.research.google.com/github/CompVis/taming-transformers/blob/master/scripts/reconstruction_usage.ipynb) which compares two VQGANs and OpenAI's [DALL-E](https://github.com/openai/DALL-E). See also [this section](#more-resources).
 - We now include an overview of pretrained models in [Tab.1](#overview-of-pretrained-models)
 - The streamlit demo now supports image completions.
 - We now include a couple of examples from the D-RIN dataset so you can run the
@@ -31,7 +31,7 @@ conda activate taming
 ## Overview of pretrained models
 The following table provides an overview of all models that are currently available. 
 FID scores were evaluated using [torch-fidelity](https://github.com/toshas/torch-fidelity) and without rejection sampling.
-For reference, we also include a link to the recently released autoencoder of the [DALL-E]() model. 
+For reference, we also include a link to the recently released autoencoder of the [DALL-E](https://github.com/openai/DALL-E) model. 
 See the corresponding [colab
 notebook](https://colab.research.google.com/github/CompVis/taming-transformers/blob/master/scripts/reconstruction_usage.ipynb)
 for a comparison and discussion of reconstruction capabilities.
@@ -51,7 +51,7 @@ for a comparison and discussion of reconstruction capabilities.
 | VQGAN ImageNet (f=16), 1024| 8.0 | [vqgan_imagenet_f16_1024](https://heibox.uni-heidelberg.de/d/8088892a516d4e3baf92/) | [reconstructions](https://k00.fr/j626x093) | Reconstruction-FIDs evaluated against the validation split of ImageNet on 256x256 images.
 | VQGAN ImageNet (f=16), 16384| 4.9 |[vqgan_imagenet_f16_16384](https://heibox.uni-heidelberg.de/d/a7530b09fed84f80a887/)  |  [reconstructions](https://k00.fr/j626x093) | Reconstruction-FIDs evaluated against the validation split of ImageNet on 256x256 images.
 | |  | | || |
-| DALL-E VQVA (f=8), 8192, GumbelQuantization| 34.3 | https://github.com/openai/DALL-E | [reconstructions](https://k00.fr/j626x093) | Reconstruction-FIDs evaluated against the validation split of ImageNet on 256x256 images.
+| DALL-E VQVAE (f=8), 8192, GumbelQuantization| 34.3 | https://github.com/openai/DALL-E | [reconstructions](https://k00.fr/j626x093) | Reconstruction-FIDs evaluated against the validation split of ImageNet on 256x256 images.
 
 
 ## Running pretrained models
