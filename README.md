@@ -86,6 +86,15 @@ included in the repository, run
 streamlit run scripts/sample_conditional.py -- -r logs/2021-01-20T16-04-20_coco_transformer/ --ignore_base_data data="{target: main.DataModuleFromConfig, params: {batch_size: 1, validation: {target: taming.data.coco.Examples}}}"
 ```
 
+### ADE20k
+Download [2020-11-20T21-45-44_ade20k_transformer](https://k00.fr/ot46cksa) and
+place it into `logs`. To run the demo on a couple of example segmentation maps
+included in the repository, run
+
+```
+streamlit run scripts/sample_conditional.py -- -r logs/2020-11-20T21-45-44_ade20k_transformer/ --ignore_base_data data="{target: main.DataModuleFromConfig, params: {batch_size: 1, validation: {target: taming.data.ade20k.Examples}}}"
+```
+
 ## Data Preparation
 
 ### ImageNet
@@ -170,6 +179,11 @@ the [Stuff+thing PNG-style annotations on COCO 2017
 trainval](http://calvin.inf.ed.ac.uk/wp-content/uploads/data/cocostuffdataset/stuffthingmaps_trainval2017.zip)
 annotations from [COCO-Stuff](https://github.com/nightrome/cocostuff), which
 should be placed under `data/cocostuffthings`.
+
+### ADE20k
+Create a symlink `data/ade20k_root` containing the contents of
+[ADEChallengeData2016.zip](http://data.csail.mit.edu/places/ADEchallenge/ADEChallengeData2016.zip)
+from the [MIT Scene Parsing Benchmark](http://sceneparsing.csail.mit.edu/).
 
 ## Training models
 
