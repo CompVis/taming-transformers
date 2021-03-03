@@ -14,7 +14,7 @@
 
 ### News
 - We added a [colab notebook](https://colab.research.google.com/github/CompVis/taming-transformers/blob/master/scripts/reconstruction_usage.ipynb) which compares two VQGANs and OpenAI's [DALL-E](https://github.com/openai/DALL-E). See also [this section](#more-resources).
-- We now include an overview of pretrained models in [Tab.1](#overview-of-pretrained-models)
+- We now include an overview of pretrained models in [Tab.1](#overview-of-pretrained-models). We added models for [COCO](#coco) and [ADE20k](#ade20k).
 - The streamlit demo now supports image completions.
 - We now include a couple of examples from the D-RIN dataset so you can run the
   [D-RIN demo](#d-rin) without preparing the dataset first.
