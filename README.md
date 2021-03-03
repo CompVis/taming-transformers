@@ -30,6 +30,12 @@ conda activate taming
 
 ## Running pretrained models
 
+The commands below will start a streamlit demo which supports sampling at
+different resolutions and image completions. To run a non-interactive version
+of the sampling process, replace `streamlit run scripts/sample_conditional.py --`
+by `python scripts/make_samples.py --outdir <path_to_write_samples_to>` and
+keep the remaining command line arguments.
+
 ### S-FLCKR
 ![teaser](assets/sunset_and_ocean.jpg)
 
@@ -69,6 +75,15 @@ To run the demo on the complete validation set, first follow the data preparatio
 [ImageNet](#imagenet) and then run
 ```
 streamlit run scripts/sample_conditional.py -- -r logs/2020-11-20T12-54-32_drin_transformer/
+```
+
+### COCO
+Download [2021-01-20T16-04-20_coco_transformer](https://k00.fr/2zz6i2ce) and
+place it into `logs`. To run the demo on a couple of example segmentation maps
+included in the repository, run
+
+```
+streamlit run scripts/sample_conditional.py -- -r logs/2021-01-20T16-04-20_coco_transformer/ --ignore_base_data data="{target: main.DataModuleFromConfig, params: {batch_size: 1, validation: {target: taming.data.coco.Examples}}}"
 ```
 
 ## Data Preparation
@@ -146,6 +161,15 @@ masks for each image using [DeepLab v2](https://arxiv.org/abs/1606.00915)
 trained on [COCO-Stuff](https://arxiv.org/abs/1612.03716). We used a [PyTorch
 reimplementation](https://github.com/kazuto1011/deeplab-pytorch) and include an
 example script for this process in `scripts/extract_segmentation.py`.
+
+### COCO
+Create a symlink `data/coco` containing the images from the 2017 split in
+`train2017` and `val2017`, and their annotations in `annotations`. Files can be
+obtained from the [COCO webpage](https://cocodataset.org/). In addition, we use
+the [Stuff+thing PNG-style annotations on COCO 2017
+trainval](http://calvin.inf.ed.ac.uk/wp-content/uploads/data/cocostuffdataset/stuffthingmaps_trainval2017.zip)
+annotations from [COCO-Stuff](https://github.com/nightrome/cocostuff), which
+should be placed under `data/cocostuffthings`.
 
 ## Training models
 
