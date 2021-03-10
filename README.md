@@ -13,8 +13,8 @@
 [arXiv](https://arxiv.org/abs/2012.09841) | [BibTeX](#bibtex) | [Project Page](https://compvis.github.io/taming-transformers/)
 
 ### News
-- We added a [colab notebook](https://colab.research.google.com/github/CompVis/taming-transformers/blob/master/scripts/reconstruction_usage.ipynb) which compares two VQGANs and OpenAI's [DALL-E](). See also [this section](#more-resources).
-- We now include an overview of pretrained models in [Tab.1](#overview-of-pretrained-models)
+- We added a [colab notebook](https://colab.research.google.com/github/CompVis/taming-transformers/blob/master/scripts/reconstruction_usage.ipynb) which compares two VQGANs and OpenAI's [DALL-E](https://github.com/openai/DALL-E). See also [this section](#more-resources).
+- We now include an overview of pretrained models in [Tab.1](#overview-of-pretrained-models). We added models for [COCO](#coco) and [ADE20k](#ade20k).
 - The streamlit demo now supports image completions.
 - We now include a couple of examples from the D-RIN dataset so you can run the
   [D-RIN demo](#d-rin) without preparing the dataset first.
@@ -31,8 +31,10 @@ conda activate taming
 ## Overview of pretrained models
 The following table provides an overview of all models that are currently available. 
 FID scores were evaluated using [torch-fidelity](https://github.com/toshas/torch-fidelity) and without rejection sampling.
-For reference, we also include a link to the recently released autoencoder of the [DALL-E]() model. 
-See the corresponding [colab notebook](todo) for a comparison and discussion of reconstruction capabilities.
+For reference, we also include a link to the recently released autoencoder of the [DALL-E](https://github.com/openai/DALL-E) model. 
+See the corresponding [colab
+notebook](https://colab.research.google.com/github/CompVis/taming-transformers/blob/master/scripts/reconstruction_usage.ipynb)
+for a comparison and discussion of reconstruction capabilities.
 
 | Dataset  | FID | Link |  Samples (256x256) | Comments
 | ------------- | ------------- |-------------  | -------------  |-------------  |
@@ -46,10 +48,10 @@ See the corresponding [colab notebook](todo) for a comparison and discussion of 
 | S-FLCKR (f=16) | -- | [sflckr](https://heibox.uni-heidelberg.de/d/73487ab6e5314cb5adba/) 
 | D-RIN (f=16) | -- | [drin_transformer](https://k00.fr/39jcugc5)
 | |  | | || |
-| VQGAN ImageNet (f=16), 1024| 8.0 | [vqgan_imagenet_f16_1024](https://heibox.uni-heidelberg.de/d/8088892a516d4e3baf92/) | TODO | Reconstruction-FIDs evaluated against the validation split of ImageNet on 256x256 images. Check out the [colab notebook](https://colab.research.google.com/github/CompVis/taming-transformers/blob/master/scripts/reconstruction_usage.ipynb)
-| VQGAN ImageNet (f=16), 16384| 4.9 |[vqgan_imagenet_f16_16384](https://heibox.uni-heidelberg.de/d/a7530b09fed84f80a887/)  |  TODO | Reconstruction-FIDs evaluated against the validation split of ImageNet on 256x256 images. Check out the [colab notebook](https://colab.research.google.com/github/CompVis/taming-transformers/blob/master/scripts/reconstruction_usage.ipynb)
+| VQGAN ImageNet (f=16), 1024| 8.0 | [vqgan_imagenet_f16_1024](https://heibox.uni-heidelberg.de/d/8088892a516d4e3baf92/) | [reconstructions](https://k00.fr/j626x093) | Reconstruction-FIDs evaluated against the validation split of ImageNet on 256x256 images.
+| VQGAN ImageNet (f=16), 16384| 4.9 |[vqgan_imagenet_f16_16384](https://heibox.uni-heidelberg.de/d/a7530b09fed84f80a887/)  |  [reconstructions](https://k00.fr/j626x093) | Reconstruction-FIDs evaluated against the validation split of ImageNet on 256x256 images.
 | |  | | || |
-| DALL-E VQVA (f=8), 8192, GumbelQuantization| 34.3 | https://github.com/openai/DALL-E | TODO | Reconstruction-FIDs evaluated against the validation split of ImageNet on 256x256 images. Check out the [colab notebook](https://colab.research.google.com/github/CompVis/taming-transformers/blob/master/scripts/reconstruction_usage.ipynb)
+| DALL-E VQVAE (f=8), 8192, GumbelQuantization| 34.3 | https://github.com/openai/DALL-E | [reconstructions](https://k00.fr/j626x093) | Reconstruction-FIDs evaluated against the validation split of ImageNet on 256x256 images.
 
 
 ## Running pretrained models
