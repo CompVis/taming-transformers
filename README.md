@@ -1,4 +1,4 @@
-# Taming Transformers for High-Resolution Image Synthesis
+# Taming Transformers for High-Resolution Image Synthesis, CVPR 2021 (Oral)
 ![teaser](assets/mountain.jpeg)
 
 [**Taming Transformers for High-Resolution Image Synthesis**](https://compvis.github.io/taming-transformers/)<br/>
