@@ -10,8 +10,10 @@ class SegmentationBase(Dataset):
     def __init__(self,
                  data_csv, data_root, segmentation_root,
                  size=None, random_crop=False, interpolation="bicubic",
+                 n_labels=182, shift_segmentation=False,
                  ):
-        self.n_labels = 182
+        self.n_labels = n_labels
+        self.shift_segmentation = shift_segmentation
         self.data_csv = data_csv
         self.data_root = data_root
         self.segmentation_root = segmentation_root
@@ -59,7 +61,11 @@ class SegmentationBase(Dataset):
         if self.size is not None:
             image = self.image_rescaler(image=image)["image"]
         segmentation = Image.open(example["segmentation_path_"])
+        assert segmentation.mode == "L", segmentation.mode
         segmentation = np.array(segmentation).astype(np.uint8)
+        if self.shift_segmentation:
+            # used to support segmentations containing unlabeled==255 label
+            segmentation = segmentation+1
         if self.size is not None:
             segmentation = self.segmentation_rescaler(image=segmentation)["image"]
         if self.size is not None:

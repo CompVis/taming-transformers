@@ -1,4 +1,4 @@
-# Taming Transformers for High-Resolution Image Synthesis
+# Taming Transformers for High-Resolution Image Synthesis, CVPR 2021 (Oral)
 ![teaser](assets/mountain.jpeg)
 
 [**Taming Transformers for High-Resolution Image Synthesis**](https://compvis.github.io/taming-transformers/)<br/>
@@ -13,11 +13,12 @@
 [arXiv](https://arxiv.org/abs/2012.09841) | [BibTeX](#bibtex) | [Project Page](https://compvis.github.io/taming-transformers/)
 
 ### News
-
+- We added a [colab notebook](https://colab.research.google.com/github/CompVis/taming-transformers/blob/master/scripts/reconstruction_usage.ipynb) which compares two VQGANs and OpenAI's [DALL-E](https://github.com/openai/DALL-E). See also [this section](#more-resources).
+- We now include an overview of pretrained models in [Tab.1](#overview-of-pretrained-models). We added models for [COCO](#coco) and [ADE20k](#ade20k).
+- The streamlit demo now supports image completions.
 - We now include a couple of examples from the D-RIN dataset so you can run the
   [D-RIN demo](#d-rin) without preparing the dataset first.
 - You can now jump right into sampling with our [Colab quickstart notebook](https://colab.research.google.com/github/CompVis/taming-transformers/blob/master/scripts/taming-transformers.ipynb).
-- Take a look at [ak9250's notebook](https://github.com/ak9250/taming-transformers/blob/master/tamingtransformerscolab.ipynb) if you want to run the streamlit demos on Colab.
 
 ## Requirements
 A suitable [conda](https://conda.io/) environment named `taming` can be created
@@ -27,8 +28,39 @@ and activated with:
 conda env create -f environment.yaml
 conda activate taming
 ```
+## Overview of pretrained models
+The following table provides an overview of all models that are currently available. 
+FID scores were evaluated using [torch-fidelity](https://github.com/toshas/torch-fidelity) and without rejection sampling.
+For reference, we also include a link to the recently released autoencoder of the [DALL-E](https://github.com/openai/DALL-E) model. 
+See the corresponding [colab
+notebook](https://colab.research.google.com/github/CompVis/taming-transformers/blob/master/scripts/reconstruction_usage.ipynb)
+for a comparison and discussion of reconstruction capabilities.
+
+| Dataset  | FID | Link |  Samples (256x256) | Comments
+| ------------- | ------------- |-------------  | -------------  |-------------  |
+| FFHQ (f=16) | 11.4 | coming soon... | 
+| CelebA-HQ (f=16) | 10.7 | coming soon... | 
+| ADE20K (f=16) | 35.5  | [ade20k_transformer](https://k00.fr/ot46cksa) | [ade20k_samples.zip](https://heibox.uni-heidelberg.de/f/70bb78cbaf844501b8fb/) [2k] | evaluated on val split (2k images)
+| COCO-Stuff (f=16) | 20.4  | [coco_transformer](https://k00.fr/2zz6i2ce) | [coco_samples.zip](https://heibox.uni-heidelberg.de/f/a395a9be612f4a7a8054/) [5k] | evaluated on val split (5k images)
+| ImageNet (cIN) (f=16) |  | coming soon...
+| |  | | || |
+| FacesHQ (f=16) | -- | [faceshq_transformer](https://k00.fr/qqfl2do8)
+| S-FLCKR (f=16) | -- | [sflckr](https://heibox.uni-heidelberg.de/d/73487ab6e5314cb5adba/) 
+| D-RIN (f=16) | -- | [drin_transformer](https://k00.fr/39jcugc5)
+| |  | | || |
+| VQGAN ImageNet (f=16), 1024| 8.0 | [vqgan_imagenet_f16_1024](https://heibox.uni-heidelberg.de/d/8088892a516d4e3baf92/) | [reconstructions](https://k00.fr/j626x093) | Reconstruction-FIDs evaluated against the validation split of ImageNet on 256x256 images.
+| VQGAN ImageNet (f=16), 16384| 4.9 |[vqgan_imagenet_f16_16384](https://heibox.uni-heidelberg.de/d/a7530b09fed84f80a887/)  |  [reconstructions](https://k00.fr/j626x093) | Reconstruction-FIDs evaluated against the validation split of ImageNet on 256x256 images.
+| |  | | || |
+| DALL-E VQVAE (f=8), 8192, GumbelQuantization| 34.3 | https://github.com/openai/DALL-E | [reconstructions](https://k00.fr/j626x093) | Reconstruction-FIDs evaluated against the validation split of ImageNet on 256x256 images.
+
 
 ## Running pretrained models
+
+The commands below will start a streamlit demo which supports sampling at
+different resolutions and image completions. To run a non-interactive version
+of the sampling process, replace `streamlit run scripts/sample_conditional.py --`
+by `python scripts/make_samples.py --outdir <path_to_write_samples_to>` and
+keep the remaining command line arguments.
 
 ### S-FLCKR
 ![teaser](assets/sunset_and_ocean.jpg)
@@ -69,6 +101,24 @@ To run the demo on the complete validation set, first follow the data preparatio
 [ImageNet](#imagenet) and then run
 ```
 streamlit run scripts/sample_conditional.py -- -r logs/2020-11-20T12-54-32_drin_transformer/
+```
+
+### COCO
+Download [2021-01-20T16-04-20_coco_transformer](https://k00.fr/2zz6i2ce) and
+place it into `logs`. To run the demo on a couple of example segmentation maps
+included in the repository, run
+
+```
+streamlit run scripts/sample_conditional.py -- -r logs/2021-01-20T16-04-20_coco_transformer/ --ignore_base_data data="{target: main.DataModuleFromConfig, params: {batch_size: 1, validation: {target: taming.data.coco.Examples}}}"
+```
+
+### ADE20k
+Download [2020-11-20T21-45-44_ade20k_transformer](https://k00.fr/ot46cksa) and
+place it into `logs`. To run the demo on a couple of example segmentation maps
+included in the repository, run
+
+```
+streamlit run scripts/sample_conditional.py -- -r logs/2020-11-20T21-45-44_ade20k_transformer/ --ignore_base_data data="{target: main.DataModuleFromConfig, params: {batch_size: 1, validation: {target: taming.data.ade20k.Examples}}}"
 ```
 
 ## Data Preparation
@@ -147,6 +197,20 @@ trained on [COCO-Stuff](https://arxiv.org/abs/1612.03716). We used a [PyTorch
 reimplementation](https://github.com/kazuto1011/deeplab-pytorch) and include an
 example script for this process in `scripts/extract_segmentation.py`.
 
+### COCO
+Create a symlink `data/coco` containing the images from the 2017 split in
+`train2017` and `val2017`, and their annotations in `annotations`. Files can be
+obtained from the [COCO webpage](https://cocodataset.org/). In addition, we use
+the [Stuff+thing PNG-style annotations on COCO 2017
+trainval](http://calvin.inf.ed.ac.uk/wp-content/uploads/data/cocostuffdataset/stuffthingmaps_trainval2017.zip)
+annotations from [COCO-Stuff](https://github.com/nightrome/cocostuff), which
+should be placed under `data/cocostuffthings`.
+
+### ADE20k
+Create a symlink `data/ade20k_root` containing the contents of
+[ADEChallengeData2016.zip](http://data.csail.mit.edu/places/ADEchallenge/ADEChallengeData2016.zip)
+from the [MIT Scene Parsing Benchmark](http://sceneparsing.csail.mit.edu/).
+
 ## Training models
 
 ### FacesHQ
@@ -201,6 +265,21 @@ To train the transformer, run
 ```
 python main.py --base configs/drin_transformer.yaml -t True --gpus 0,
 ```
+
+## More Resources
+### Comparing Different First Stage Models
+The reconstruction and compression capabilities of different fist stage models can be analyzed in this [colab notebook](https://colab.research.google.com/github/CompVis/taming-transformers/blob/master/scripts/reconstruction_usage.ipynb). 
+In particular, the notebook compares two VQGANs (with a downsampling factor of f=16 for each and codebook dimensionality of 1024 and 16384) and 
+the discrete autoencoder of OpenAI's [DALL-E](https://github.com/openai/DALL-E) (which has f=8).
+![firststages](assets/first_stage_squirrels.png)
+
+### Other
+- A [video summary](https://www.youtube.com/watch?v=o7dqGcLDf0A&feature=emb_imp_woyt) by [Two Minute Papers](https://www.youtube.com/channel/UCbfYPyITQ-7l4upoX8nvctg).
+- A [video summary](https://www.youtube.com/watch?v=-wDSDtIAyWQ) by [Gradient Dude](https://www.youtube.com/c/GradientDude/about).
+- A [weights and biases report summarizing the paper](https://wandb.ai/ayush-thakur/taming-transformer/reports/-Overview-Taming-Transformers-for-High-Resolution-Image-Synthesis---Vmlldzo0NjEyMTY)
+by [ayulockin](https://github.com/ayulockin).
+- A [video summary](https://www.youtube.com/watch?v=JfUTd8fjtX8&feature=emb_imp_woyt) by [What's AI](https://www.youtube.com/channel/UCUzGQrN-lyyc0BWTYoJM_Sg).
+- Take a look at [ak9250's notebook](https://github.com/ak9250/taming-transformers/blob/master/tamingtransformerscolab.ipynb) if you want to run the streamlit demos on Colab.
 
 ## Shout-outs
 Thanks to everyone who makes their code and models available. In particular,

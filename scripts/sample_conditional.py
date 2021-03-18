@@ -100,9 +100,19 @@ def run_conditional(model, dsets):
     st.image(bchw_to_st(c), clamp=True, output_format="PNG")
 
     idx = z_indices
+
+    half_sample = st.sidebar.checkbox("Image Completion", value=False)
+    if half_sample:
+        start = idx.shape[1]//2
+    else:
+        start = 0
+
+    idx[:,start:] = 0
     idx = idx.reshape(cshape[0],cshape[2],cshape[3])
-    idx[:,:,:] = 0
-    if quant_z.shape == quant_c.shape:
+    start_i = start//cshape[3]
+    start_j = start %cshape[3]
+
+    if not half_sample and quant_z.shape == quant_c.shape:
         st.info("Setting idx to c_indices")
         idx = c_indices.clone().reshape(cshape[0],cshape[2],cshape[3])
 
@@ -130,14 +140,14 @@ def run_conditional(model, dsets):
     if st.button("Sample"):
         output = st.empty()
         start_t = time.time()
-        for i in range(0,cshape[2]-0):
+        for i in range(start_i,cshape[2]-0):
             if i <= 8:
                 local_i = i
             elif cshape[2]-i < 8:
                 local_i = 16-(cshape[2]-i)
             else:
                 local_i = 8
-            for j in range(0,cshape[3]-0):
+            for j in range(start_j,cshape[3]-0):
                 if j <= 8:
                     local_j = j
                 elif cshape[3]-j < 8:
