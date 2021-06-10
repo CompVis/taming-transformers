@@ -4,6 +4,7 @@ import torch.nn.functional as F
 import pytorch_lightning as pl
 
 from main import instantiate_from_config
+from taming.modules.util import SOSProvider
 
 
 def disabled_train(self, mode=True):
@@ -13,15 +14,25 @@ def disabled_train(self, mode=True):
 
 
 class Net2NetTransformer(pl.LightningModule):
-    def __init__(self, transformer_config, first_stage_config,
-                 cond_stage_config, permuter_config=None,
-                 ckpt_path=None, ignore_keys=[],
+    def __init__(self,
+                 transformer_config,
+                 first_stage_config,
+                 cond_stage_config,
+                 permuter_config=None,
+                 ckpt_path=None,
+                 ignore_keys=[],
                  first_stage_key="image",
                  cond_stage_key="depth",
                  downsample_cond_size=-1,
-                 pkeep=1.0):
-
+                 pkeep=1.0,
+                 sos_token=0,
+                 unconditional=False,
+                 ):
         super().__init__()
+        self.be_unconditional = unconditional
+        self.sos_token = sos_token
+        self.first_stage_key = first_stage_key
+        self.cond_stage_key = cond_stage_key
         self.init_first_stage_from_ckpt(first_stage_config)
         self.init_cond_stage_from_ckpt(cond_stage_config)
         if permuter_config is None:
@@ -31,8 +42,6 @@ class Net2NetTransformer(pl.LightningModule):
 
         if ckpt_path is not None:
             self.init_from_ckpt(ckpt_path, ignore_keys=ignore_keys)
-        self.first_stage_key = first_stage_key
-        self.cond_stage_key = cond_stage_key
         self.downsample_cond_size = downsample_cond_size
         self.pkeep = pkeep
 
@@ -53,10 +62,20 @@ class Net2NetTransformer(pl.LightningModule):
         self.first_stage_model = model
 
     def init_cond_stage_from_ckpt(self, config):
-        model = instantiate_from_config(config)
-        model = model.eval()
-        model.train = disabled_train
-        self.cond_stage_model = model
+        if config == "__is_first_stage__":
+            print("Using first stage also as cond stage.")
+            self.cond_stage_model = self.first_stage_model
+        elif config == "__is_unconditional__" or self.be_unconditional:
+            print(f"Using no cond stage. Assuming the training is intended to be unconditional. "
+                  f"Prepending {self.sos_token} as a sos token.")
+            self.be_unconditional = True
+            self.cond_stage_key = self.first_stage_key
+            self.cond_stage_model = SOSProvider(self.sos_token)
+        else:
+            model = instantiate_from_config(config)
+            model = model.eval()
+            model.train = disabled_train
+            self.cond_stage_model = model
 
     def forward(self, x, c):
         # one step to produce the logits
@@ -157,8 +176,9 @@ class Net2NetTransformer(pl.LightningModule):
     def encode_to_c(self, c):
         if self.downsample_cond_size > -1:
             c = F.interpolate(c, size=(self.downsample_cond_size, self.downsample_cond_size))
-        quant_c, _, info = self.cond_stage_model.encode(c)
-        indices = info[2].view(quant_c.shape[0], -1)
+        quant_c, _, [_,_,indices] = self.cond_stage_model.encode(c)
+        if len(indices.shape) > 2:
+            indices = indices.view(c.shape[0], -1)
         return quant_c, indices
 
     @torch.no_grad()
@@ -246,7 +266,8 @@ class Net2NetTransformer(pl.LightningModule):
         x = batch[key]
         if len(x.shape) == 3:
             x = x[..., None]
-        x = x.permute(0, 3, 1, 2).to(memory_format=torch.contiguous_format)
+        if len(x.shape) == 4:
+            x = x.permute(0, 3, 1, 2).to(memory_format=torch.contiguous_format)
         if x.dtype == torch.double:
             x = x.float()
         return x

@@ -14,6 +14,7 @@ import logging
 import torch
 import torch.nn as nn
 from torch.nn import functional as F
+from transformers import top_k_top_p_filtering
 
 logger = logging.getLogger(__name__)
 
@@ -36,11 +37,6 @@ class GPT1Config(GPTConfig):
     n_layer = 12
     n_head = 12
     n_embd = 768
-
-
-class GPT2Config(GPTConfig):
-    """ GPT-2 like network roughly 1.5B params """
-    # TODO
 
 
 class CausalSelfAttention(nn.Module):
@@ -78,9 +74,17 @@ class CausalSelfAttention(nn.Module):
         q = self.query(x).view(B, T, self.n_head, C // self.n_head).transpose(1, 2) # (B, nh, T, hs)
         v = self.value(x).view(B, T, self.n_head, C // self.n_head).transpose(1, 2) # (B, nh, T, hs)
 
+        present = torch.stack((k, v))
+        if layer_past is not None:
+            past_key, past_value = layer_past
+            k = torch.cat((past_key, k), dim=-2)
+            v = torch.cat((past_value, v), dim=-2)
+
         # causal self-attention; Self-attend: (B, nh, T, hs) x (B, nh, hs, T) -> (B, nh, T, T)
         att = (q @ k.transpose(-2, -1)) * (1.0 / math.sqrt(k.size(-1)))
-        att = att.masked_fill(self.mask[:,:,:T,:T] == 0, float('-inf'))
+        if layer_past is None:
+            att = att.masked_fill(self.mask[:,:,:T,:T] == 0, float('-inf'))
+
         att = F.softmax(att, dim=-1)
         att = self.attn_drop(att)
         y = att @ v # (B, nh, T, T) x (B, nh, T, hs) -> (B, nh, T, hs)
@@ -88,7 +92,7 @@ class CausalSelfAttention(nn.Module):
 
         # output projection
         y = self.resid_drop(self.proj(y))
-        return y
+        return y, present   # TODO: check that this does not break anything
 
 
 class Block(nn.Module):
@@ -105,9 +109,16 @@ class Block(nn.Module):
             nn.Dropout(config.resid_pdrop),
         )
 
-    def forward(self, x):
-        x = x + self.attn(self.ln1(x))
+    def forward(self, x, layer_past=None, return_present=False):
+        # TODO: check that training still works
+        if return_present: assert not self.training
+        # layer past: tuple of length two with B, nh, T, hs
+        attn, present = self.attn(self.ln1(x), layer_past=layer_past)
+
+        x = x + attn
         x = x + self.mlp(self.ln2(x))
+        if layer_past is not None or return_present:
+            return x, present
         return x
 
 
@@ -168,6 +179,38 @@ class GPT(nn.Module):
 
         return logits, loss
 
+    def forward_with_past(self, idx, embeddings=None, targets=None, past=None, past_length=None):
+        # inference only
+        assert not self.training
+        token_embeddings = self.tok_emb(idx)    # each index maps to a (learnable) vector
+        if embeddings is not None:              # prepend explicit embeddings
+            token_embeddings = torch.cat((embeddings, token_embeddings), dim=1)
+
+        if past is not None:
+            assert past_length is not None
+            past = torch.cat(past, dim=-2)   # n_layer, 2, b, nh, len_past, dim_head
+            past_shape = list(past.shape)
+            expected_shape = [self.config.n_layer, 2, idx.shape[0], self.config.n_head, past_length, self.config.n_embd//self.config.n_head]
+            assert past_shape == expected_shape, f"{past_shape} =/= {expected_shape}"
+            position_embeddings = self.pos_emb[:, past_length, :]  # each position maps to a (learnable) vector
+        else:
+            position_embeddings = self.pos_emb[:, :token_embeddings.shape[1], :]
+
+        x = self.drop(token_embeddings + position_embeddings)
+        presents = []  # accumulate over layers
+        for i, block in enumerate(self.blocks):
+            x, present = block(x, layer_past=past[i, ...] if past is not None else None, return_present=True)
+            presents.append(present)
+
+        x = self.ln_f(x)
+        logits = self.head(x)
+        # if we are given some desired targets also calculate the loss
+        loss = None
+        if targets is not None:
+            loss = F.cross_entropy(logits.view(-1, logits.size(-1)), targets.view(-1))
+
+        return logits, loss, torch.stack(presents)  # _, _, n_layer, 2, b, nh, 1, dim_head
+
 
 class DummyGPT(nn.Module):
     # for debugging
@@ -226,7 +269,7 @@ class CodeGPT(nn.Module):
         position_embeddings = self.pos_emb[:, :t, :] # each position maps to a (learnable) vector
         x = self.drop(token_embeddings + position_embeddings)
         x = self.blocks(x)
-        x = self.ln_f(x)
+        x = self.taming_cinln_f(x)
         logits = self.head(x)
 
         # if we are given some desired targets also calculate the loss
@@ -276,6 +319,36 @@ def sample(model, x, steps, temperature=1.0, sample=False, top_k=None):
 
     return x
 
+
+@torch.no_grad()
+def sample_with_past(x, model, steps, temperature=1., sample_logits=True,
+                     top_k=None, top_p=None, callback=None):
+    # x is conditioning
+    sample = x
+    cond_len = x.shape[1]
+    past = None
+    for n in range(steps):
+        if callback is not None:
+            callback(n)
+        logits, _, present = model.forward_with_past(x, past=past, past_length=(n+cond_len-1))
+        if past is None:
+            past = [present]
+        else:
+            past.append(present)
+        logits = logits[:, -1, :] / temperature
+        if top_k is not None:
+            logits = top_k_top_p_filtering(logits, top_k=top_k, top_p=top_p)
+
+        probs = F.softmax(logits, dim=-1)
+        if not sample_logits:
+            _, x = torch.topk(probs, k=1, dim=-1)
+        else:
+            x = torch.multinomial(probs, num_samples=1)
+        # append to the sequence and continue
+        sample = torch.cat((sample, x), dim=1)
+    del past
+    sample = sample[:, cond_len:]  # cut conditioning off
+    return sample
 
 
 #### clustering utils

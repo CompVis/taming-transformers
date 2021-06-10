@@ -1,4 +1,5 @@
-# Taming Transformers for High-Resolution Image Synthesis, CVPR 2021 (Oral)
+# Taming Transformers for High-Resolution Image Synthesis
+##### CVPR 2021 (Oral)
 ![teaser](assets/mountain.jpeg)
 
 [**Taming Transformers for High-Resolution Image Synthesis**](https://compvis.github.io/taming-transformers/)<br/>
@@ -12,7 +13,14 @@
 ![teaser](assets/teaser.png)
 [arXiv](https://arxiv.org/abs/2012.09841) | [BibTeX](#bibtex) | [Project Page](https://compvis.github.io/taming-transformers/)
 
+
 ### News
+- Our paper received an update: See https://arxiv.org/abs/2012.09841v3 and the corresponding changelog.
+- Added a pretrained, [1.4B transformer model](https://k00.fr/s511rwcv) trained for class-conditional ImageNet synthesis, which obtains state-of-the-art FID scores among autoregressive approaches and outperforms BigGAN.
+- Added pretrained, unconditional models on [FFHQ](https://k00.fr/yndvfu95) and [CelebA-HQ](https://k00.fr/2xkmielf).
+- Added accelerated sampling via caching of keys/values in the self-attention operation, used in `scripts/sample_fast.py`.
+- Added a checkpoint of a [VQGAN](https://heibox.uni-heidelberg.de/d/2e5662443a6b4307b470/) trained with f8 compression and Gumbel-Quantization. 
+  See also our updated [reconstruction notebook](https://colab.research.google.com/github/CompVis/taming-transformers/blob/master/scripts/reconstruction_usage.ipynb). 
 - We added a [colab notebook](https://colab.research.google.com/github/CompVis/taming-transformers/blob/master/scripts/reconstruction_usage.ipynb) which compares two VQGANs and OpenAI's [DALL-E](https://github.com/openai/DALL-E). See also [this section](#more-resources).
 - We now include an overview of pretrained models in [Tab.1](#overview-of-pretrained-models). We added models for [COCO](#coco) and [ADE20k](#ade20k).
 - The streamlit demo now supports image completions.
@@ -30,28 +38,29 @@ conda activate taming
 ```
 ## Overview of pretrained models
 The following table provides an overview of all models that are currently available. 
-FID scores were evaluated using [torch-fidelity](https://github.com/toshas/torch-fidelity) and without rejection sampling.
+FID scores were evaluated using [torch-fidelity](https://github.com/toshas/torch-fidelity).
 For reference, we also include a link to the recently released autoencoder of the [DALL-E](https://github.com/openai/DALL-E) model. 
 See the corresponding [colab
 notebook](https://colab.research.google.com/github/CompVis/taming-transformers/blob/master/scripts/reconstruction_usage.ipynb)
 for a comparison and discussion of reconstruction capabilities.
 
-| Dataset  | FID | Link |  Samples (256x256) | Comments
-| ------------- | ------------- |-------------  | -------------  |-------------  |
-| FFHQ (f=16) | 11.4 | coming soon... | 
-| CelebA-HQ (f=16) | 10.7 | coming soon... | 
-| ADE20K (f=16) | 35.5  | [ade20k_transformer](https://k00.fr/ot46cksa) | [ade20k_samples.zip](https://heibox.uni-heidelberg.de/f/70bb78cbaf844501b8fb/) [2k] | evaluated on val split (2k images)
-| COCO-Stuff (f=16) | 20.4  | [coco_transformer](https://k00.fr/2zz6i2ce) | [coco_samples.zip](https://heibox.uni-heidelberg.de/f/a395a9be612f4a7a8054/) [5k] | evaluated on val split (5k images)
-| ImageNet (cIN) (f=16) |  | coming soon...
+| Dataset  | FID vs train | FID vs val | Link |  Samples (256x256) | Comments
+| ------------- | ------------- | ------------- |-------------  | -------------  |-------------  |
+| FFHQ (f=16) | 9.6 | -- | [ffhq_transformer](https://k00.fr/yndvfu95) |  [ffhq_samples](https://k00.fr/j626x093) |
+| CelebA-HQ (f=16) | 10.2 | -- | [celebahq_transformer](https://k00.fr/2xkmielf) | [celebahq_samples](https://k00.fr/j626x093) |
+| ADE20K (f=16) | -- | 35.5 | [ade20k_transformer](https://k00.fr/ot46cksa) | [ade20k_samples.zip](https://heibox.uni-heidelberg.de/f/70bb78cbaf844501b8fb/) [2k] | evaluated on val split (2k images)
+| COCO-Stuff (f=16) | -- | 20.4  | [coco_transformer](https://k00.fr/2zz6i2ce) | [coco_samples.zip](https://heibox.uni-heidelberg.de/f/a395a9be612f4a7a8054/) [5k] | evaluated on val split (5k images)
+| ImageNet (cIN) (f=16) | 15.98/15.78/6.59/5.88/5.20 | -- | [cin_transformer](https://k00.fr/s511rwcv) | [cin_samples](https://k00.fr/j626x093) | different decoding hyperparameters |  
 | |  | | || |
-| FacesHQ (f=16) | -- | [faceshq_transformer](https://k00.fr/qqfl2do8)
-| S-FLCKR (f=16) | -- | [sflckr](https://heibox.uni-heidelberg.de/d/73487ab6e5314cb5adba/) 
-| D-RIN (f=16) | -- | [drin_transformer](https://k00.fr/39jcugc5)
-| |  | | || |
-| VQGAN ImageNet (f=16), 1024| 8.0 | [vqgan_imagenet_f16_1024](https://heibox.uni-heidelberg.de/d/8088892a516d4e3baf92/) | [reconstructions](https://k00.fr/j626x093) | Reconstruction-FIDs evaluated against the validation split of ImageNet on 256x256 images.
-| VQGAN ImageNet (f=16), 16384| 4.9 |[vqgan_imagenet_f16_16384](https://heibox.uni-heidelberg.de/d/a7530b09fed84f80a887/)  |  [reconstructions](https://k00.fr/j626x093) | Reconstruction-FIDs evaluated against the validation split of ImageNet on 256x256 images.
-| |  | | || |
-| DALL-E VQVAE (f=8), 8192, GumbelQuantization| 34.3 | https://github.com/openai/DALL-E | [reconstructions](https://k00.fr/j626x093) | Reconstruction-FIDs evaluated against the validation split of ImageNet on 256x256 images.
+| FacesHQ (f=16) | -- |  -- | [faceshq_transformer](https://k00.fr/qqfl2do8)
+| S-FLCKR (f=16) | -- | -- | [sflckr](https://heibox.uni-heidelberg.de/d/73487ab6e5314cb5adba/) 
+| D-RIN (f=16) | -- | -- | [drin_transformer](https://k00.fr/39jcugc5)
+| | |  | | || |
+| VQGAN ImageNet (f=16), 1024 |  10.54 | 7.94 | [vqgan_imagenet_f16_1024](https://heibox.uni-heidelberg.de/d/8088892a516d4e3baf92/) | [reconstructions](https://k00.fr/j626x093) | Reconstruction-FIDs.
+| VQGAN ImageNet (f=16), 16384 | 7.41 | 4.98 |[vqgan_imagenet_f16_16384](https://heibox.uni-heidelberg.de/d/a7530b09fed84f80a887/)  |  [reconstructions](https://k00.fr/j626x093) | Reconstruction-FIDs.
+| VQGAN OpenImages (f=8), 8192, GumbelQuantization | 3.24 | 1.49 |[vqgan_gumbel_f8](https://heibox.uni-heidelberg.de/d/2e5662443a6b4307b470/)  |  ---  | Reconstruction-FIDs.
+| | |  | | || |
+| DALL-E dVAE (f=8), 8192, GumbelQuantization | 33.88 | 32.01 | https://github.com/openai/DALL-E | [reconstructions](https://k00.fr/j626x093) | Reconstruction-FIDs.
 
 
 ## Running pretrained models
@@ -60,7 +69,12 @@ The commands below will start a streamlit demo which supports sampling at
 different resolutions and image completions. To run a non-interactive version
 of the sampling process, replace `streamlit run scripts/sample_conditional.py --`
 by `python scripts/make_samples.py --outdir <path_to_write_samples_to>` and
-keep the remaining command line arguments.
+keep the remaining command line arguments. 
+
+To sample from unconditional or class-conditional models, 
+run `python scripts/sample_fast.py -r <path/to/config_and_checkpoint>`.
+We describe below how to use this script to sample from the ImageNet, FFHQ, and CelebA-HQ models, 
+respectively.
 
 ### S-FLCKR
 ![teaser](assets/sunset_and_ocean.jpg)
@@ -75,6 +89,47 @@ folder and place it into `logs`. Then, run
 ```
 streamlit run scripts/sample_conditional.py -- -r logs/2020-11-09T13-31-51_sflckr/
 ```
+
+### ImageNet
+![teaser](assets/imagenet.png)
+
+Download the [2021-04-03T19-39-50_cin_transformer](https://k00.fr/s511rwcv)
+folder and place it into logs.  Sampling from the class-conditional ImageNet
+model does not require any data preparation. To produce 50 samples for each of
+the 1000 classes of ImageNet, with k=600 for top-k sampling, p=0.92 for nucleus
+sampling and temperature t=1.0, run
+
+```
+python scripts/sample_fast.py -r logs/2021-04-03T19-39-50_cin_transformer/ -n 50 -k 600 -t 1.0 -p 0.92 --batch_size 25   
+```
+
+To restrict the model to certain classes, provide them via the `--classes` argument, separated by 
+commas. For example, to sample 50 *ostriches*, *border collies* and *whiskey jugs*, run
+
+```
+python scripts/sample_fast.py -r logs/2021-04-03T19-39-50_cin_transformer/ -n 50 -k 600 -t 1.0 -p 0.92 --batch_size 25 --classes 9,232,901   
+```
+We recommended to experiment with the autoregressive decoding parameters (top-k, top-p and temperature) for best results.  
+
+### FFHQ/CelebA-HQ
+
+Download the [2021-04-23T18-19-01_ffhq_transformer](https://k00.fr/yndvfu95) and 
+[2021-04-23T18-11-19_celebahq_transformer](https://k00.fr/2xkmielf) 
+folders and place them into logs. 
+Again, sampling from these unconditional models does not require any data preparation.
+To produce 50000 samples, with k=250 for top-k sampling,
+p=1.0 for nucleus sampling and temperature t=1.0, run
+
+```
+python scripts/sample_fast.py -r logs/2021-04-23T18-19-01_ffhq_transformer/   
+```
+for FFHQ and  
+
+```
+python scripts/sample_fast.py -r logs/2021-04-23T18-11-19_celebahq_transformer/   
+```
+to sample from the CelebA-HQ model.
+For both models it can be advantageous to vary the top-k/top-p parameters for sampling.
 
 ### FacesHQ
 ![teaser](assets/faceshq.jpg)
@@ -259,9 +314,11 @@ python main.py --base configs/drin_transformer.yaml -t True --gpus 0,
 ## More Resources
 ### Comparing Different First Stage Models
 The reconstruction and compression capabilities of different fist stage models can be analyzed in this [colab notebook](https://colab.research.google.com/github/CompVis/taming-transformers/blob/master/scripts/reconstruction_usage.ipynb). 
-In particular, the notebook compares two VQGANs (with a downsampling factor of f=16 for each and codebook dimensionality of 1024 and 16384) and 
-the discrete autoencoder of OpenAI's [DALL-E](https://github.com/openai/DALL-E) (which has f=8).
-![firststages](assets/first_stage_squirrels.png)
+In particular, the notebook compares two VQGANs with a downsampling factor of f=16 for each and codebook dimensionality of 1024 and 16384, 
+a VQGAN with f=8 and 8192 codebook entries and the discrete autoencoder of OpenAI's [DALL-E](https://github.com/openai/DALL-E) (which has f=8 and 8192 
+codebook entries).
+![firststages1](assets/first_stage_squirrels.png)
+![firststages2](assets/first_stage_mushrooms.png)
 
 ### Other
 - A [video summary](https://www.youtube.com/watch?v=o7dqGcLDf0A&feature=emb_imp_woyt) by [Two Minute Papers](https://www.youtube.com/channel/UCbfYPyITQ-7l4upoX8nvctg).
@@ -270,6 +327,18 @@ the discrete autoencoder of OpenAI's [DALL-E](https://github.com/openai/DALL-E) 
 by [ayulockin](https://github.com/ayulockin).
 - A [video summary](https://www.youtube.com/watch?v=JfUTd8fjtX8&feature=emb_imp_woyt) by [What's AI](https://www.youtube.com/channel/UCUzGQrN-lyyc0BWTYoJM_Sg).
 - Take a look at [ak9250's notebook](https://github.com/ak9250/taming-transformers/blob/master/tamingtransformerscolab.ipynb) if you want to run the streamlit demos on Colab.
+
+### Text-to-Image Optimization via CLIP
+VQGAN has been successfully used as an image generator guided by the [CLIP](https://github.com/openai/CLIP) model, both for pure image generation
+from scratch and image-to-image translation. We recommend the following notebooks/videos/resources:
+
+ - [Advadnouns](https://twitter.com/advadnoun/status/1389316507134357506) Patreon and corresponding LatentVision notebooks: https://www.patreon.com/patronizeme
+ - The [notebook]( https://colab.research.google.com/drive/1L8oL-vLJXVcRzCFbPwOoMkPKJ8-aYdPN) of [Rivers Have Wings](https://twitter.com/RiversHaveWings).
+ - A [video](https://www.youtube.com/watch?v=90QDe6DQXF4&t=12s) explanation by [Dot CSV](https://www.youtube.com/channel/UCy5znSnfMsDwaLlROnZ7Qbg) (in Spanish, but English subtitles are available)
+
+![txt2img](assets/birddrawnbyachild.png)
+
+Text prompt: *'A bird drawn by a child'*
 
 ## Shout-outs
 Thanks to everyone who makes their code and models available. In particular,

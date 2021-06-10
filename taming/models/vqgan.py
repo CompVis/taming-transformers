@@ -4,8 +4,9 @@ import pytorch_lightning as pl
 
 from main import instantiate_from_config
 
-from taming.modules.diffusionmodules.model import Encoder, Decoder, VUNet
-from taming.modules.vqvae.quantize import VectorQuantizer
+from taming.modules.diffusionmodules.model import Encoder, Decoder
+from taming.modules.vqvae.quantize import VectorQuantizer2 as VectorQuantizer
+from taming.modules.vqvae.quantize import GumbelQuantize
 
 
 class VQModel(pl.LightningModule):
@@ -18,14 +19,17 @@ class VQModel(pl.LightningModule):
                  ignore_keys=[],
                  image_key="image",
                  colorize_nlabels=None,
-                 monitor=None
+                 monitor=None,
+                 remap=None,
+                 sane_index_shape=False,  # tell vector quantizer to return indices as bhw
                  ):
         super().__init__()
         self.image_key = image_key
         self.encoder = Encoder(**ddconfig)
         self.decoder = Decoder(**ddconfig)
         self.loss = instantiate_from_config(lossconfig)
-        self.quantize = VectorQuantizer(n_embed, embed_dim, beta=0.25)
+        self.quantize = VectorQuantizer(n_embed, embed_dim, beta=0.25,
+                                        remap=remap, sane_index_shape=sane_index_shape)
         self.quant_conv = torch.nn.Conv2d(ddconfig["z_channels"], embed_dim, 1)
         self.post_quant_conv = torch.nn.Conv2d(embed_dim, ddconfig["z_channels"], 1)
         if ckpt_path is not None:
@@ -252,3 +256,108 @@ class VQNoDiscModel(VQModel):
                                   list(self.post_quant_conv.parameters()),
                                   lr=self.learning_rate, betas=(0.5, 0.9))
         return optimizer
+
+
+class GumbelVQ(VQModel):
+    def __init__(self,
+                 ddconfig,
+                 lossconfig,
+                 n_embed,
+                 embed_dim,
+                 temperature_scheduler_config,
+                 ckpt_path=None,
+                 ignore_keys=[],
+                 image_key="image",
+                 colorize_nlabels=None,
+                 monitor=None,
+                 kl_weight=1e-8,
+                 remap=None,
+                 ):
+
+        z_channels = ddconfig["z_channels"]
+        super().__init__(ddconfig,
+                         lossconfig,
+                         n_embed,
+                         embed_dim,
+                         ckpt_path=None,
+                         ignore_keys=ignore_keys,
+                         image_key=image_key,
+                         colorize_nlabels=colorize_nlabels,
+                         monitor=monitor,
+                         )
+
+        self.loss.n_classes = n_embed
+        self.vocab_size = n_embed
+
+        self.quantize = GumbelQuantize(z_channels, embed_dim,
+                                       n_embed=n_embed,
+                                       kl_weight=kl_weight, temp_init=1.0,
+                                       remap=remap)
+
+        self.temperature_scheduler = instantiate_from_config(temperature_scheduler_config)   # annealing of temp
+
+        if ckpt_path is not None:
+            self.init_from_ckpt(ckpt_path, ignore_keys=ignore_keys)
+
+    def temperature_scheduling(self):
+        self.quantize.temperature = self.temperature_scheduler(self.global_step)
+
+    def encode_to_prequant(self, x):
+        h = self.encoder(x)
+        h = self.quant_conv(h)
+        return h
+
+    def decode_code(self, code_b):
+        raise NotImplementedError
+
+    def training_step(self, batch, batch_idx, optimizer_idx):
+        self.temperature_scheduling()
+        x = self.get_input(batch, self.image_key)
+        xrec, qloss = self(x)
+
+        if optimizer_idx == 0:
+            # autoencode
+            aeloss, log_dict_ae = self.loss(qloss, x, xrec, optimizer_idx, self.global_step,
+                                            last_layer=self.get_last_layer(), split="train")
+
+            self.log_dict(log_dict_ae, prog_bar=False, logger=True, on_step=True, on_epoch=True)
+            self.log("temperature", self.quantize.temperature, prog_bar=False, logger=True, on_step=True, on_epoch=True)
+            return aeloss
+
+        if optimizer_idx == 1:
+            # discriminator
+            discloss, log_dict_disc = self.loss(qloss, x, xrec, optimizer_idx, self.global_step,
+                                            last_layer=self.get_last_layer(), split="train")
+            self.log_dict(log_dict_disc, prog_bar=False, logger=True, on_step=True, on_epoch=True)
+            return discloss
+
+    def validation_step(self, batch, batch_idx):
+        x = self.get_input(batch, self.image_key)
+        xrec, qloss = self(x, return_pred_indices=True)
+        aeloss, log_dict_ae = self.loss(qloss, x, xrec, 0, self.global_step,
+                                        last_layer=self.get_last_layer(), split="val")
+
+        discloss, log_dict_disc = self.loss(qloss, x, xrec, 1, self.global_step,
+                                            last_layer=self.get_last_layer(), split="val")
+        rec_loss = log_dict_ae["val/rec_loss"]
+        self.log("val/rec_loss", rec_loss,
+                 prog_bar=True, logger=True, on_step=False, on_epoch=True, sync_dist=True)
+        self.log("val/aeloss", aeloss,
+                 prog_bar=True, logger=True, on_step=False, on_epoch=True, sync_dist=True)
+        self.log_dict(log_dict_ae)
+        self.log_dict(log_dict_disc)
+        return self.log_dict
+
+    def log_images(self, batch, **kwargs):
+        log = dict()
+        x = self.get_input(batch, self.image_key)
+        x = x.to(self.device)
+        # encode
+        h = self.encoder(x)
+        h = self.quant_conv(h)
+        quant, _, _ = self.quantize(h)
+        # decode
+        x_rec = self.decode(quant)
+        log["inputs"] = x
+        log["reconstructions"] = x_rec
+        return log
