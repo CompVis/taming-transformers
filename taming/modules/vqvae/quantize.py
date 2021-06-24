@@ -70,7 +70,7 @@ class VectorQuantizer(nn.Module):
         # ......\end......... (TODO)
 
         # compute loss for embedding
-        loss = self.beta * torch.mean((z_q.detach()-z)**2) + \
+        loss = torch.mean((z_q.detach()-z)**2) + self.beta * \
             torch.mean((z_q - z.detach()) ** 2)
 
         # preserve gradients
