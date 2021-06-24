@@ -15,6 +15,7 @@
 
 
 ### News
+- Thanks to [rom1504](https://github.com/rom1504) it is now easy to [train a VQGAN on your own datasets](#training-on-custom-data).
 - Included a bugfix for the quantizer. For backward compatibility it is
   disabled by default (which corresponds to always training with `beta=1.0`).
   Use `legacy=False` in the quantizer config to enable it.
@@ -179,6 +180,17 @@ included in the repository, run
 ```
 streamlit run scripts/sample_conditional.py -- -r logs/2020-11-20T21-45-44_ade20k_transformer/ --ignore_base_data data="{target: main.DataModuleFromConfig, params: {batch_size: 1, validation: {target: taming.data.ade20k.Examples}}}"
 ```
+
+## Training on custom data
+
+Training on your own dataset can be beneficial to get better tokens and hence better images for your domain.
+Those are the steps to follow to make this work:
+1. install the repo with `conda env create -f environment.yaml`, `conda activate taming` and `pip install -e .`
+1. put your .jpg files in a folder `your_folder`
+2. create 2 text files a `xx_train.txt` and `xx_test.txt` that point to the files in your training and test set respectively (for example `find $(pwd)/your_folder -name "*.jpg" > train.txt`)
+3. adapt `configs/custom_vqgan.yaml` to point to these 2 files
+4. run `python main.py --base configs/custom_vqgan.yaml -t True --gpus 0,1` to
+   train on two GPUs. Use `--gpus 0,` (with a trailing comma) to train on a single GPU.
 
 ## Data Preparation
 
