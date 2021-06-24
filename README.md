@@ -15,6 +15,10 @@
 
 
 ### News
+- Included a bugfix for the quantizer. For backward compatibility it is
+  disabled by default (which corresponds to always training with `beta=1.0`).
+  Use `legacy=False` in the quantizer config to enable it.
+  Thanks [richcmwang](https://github.com/richcmwang) and [wcshin-git](https://github.com/wcshin-git)!
 - Our paper received an update: See https://arxiv.org/abs/2012.09841v3 and the corresponding changelog.
 - Added a pretrained, [1.4B transformer model](https://k00.fr/s511rwcv) trained for class-conditional ImageNet synthesis, which obtains state-of-the-art FID scores among autoregressive approaches and outperforms BigGAN.
 - Added pretrained, unconditional models on [FFHQ](https://k00.fr/yndvfu95) and [CelebA-HQ](https://k00.fr/2xkmielf).

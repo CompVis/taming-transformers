@@ -18,6 +18,10 @@ class VectorQuantizer(nn.Module):
     _____________________________________________
     """
 
+    # NOTE: this class contains a bug regarding beta; see VectorQuantizer2 for
+    # a fix and use legacy=False to apply that fix. VectorQuantizer2 can be
+    # used wherever VectorQuantizer has been used before and is additionally
+    # more efficient.
     def __init__(self, n_e, e_dim, beta):
         super(VectorQuantizer, self).__init__()
         self.n_e = n_e
@@ -211,7 +215,9 @@ class VectorQuantizer2(nn.Module):
     Improved version over VectorQuantizer, can be used as a drop-in replacement. Mostly
     avoids costly matrix multiplications and allows for post-hoc remapping of indices.
     """
-    # TODO: check beta fix, maybe include 'legacy' version?
+    # NOTE: due to a bug the beta term was applied to the wrong term. for
+    # backwards compatibility we use the buggy version by default, but you can
+    # specify legacy=False to fix it.
     def __init__(self, n_e, e_dim, beta, remap=None, unknown_index="random",
                  sane_index_shape=False, legacy=True):
         super().__init__()
