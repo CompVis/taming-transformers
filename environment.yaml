@@ -20,5 +20,6 @@ dependencies:
     - test-tube>=0.7.5
     - streamlit>=0.73.1
     - einops==0.3.0
+    - more-itertools>=8.0.0
     - transformers==4.3.1
     - -e .

@@ -239,7 +239,16 @@ class Net2NetTransformer(pl.LightningModule):
         log["inputs"] = x
         log["reconstructions"] = x_rec
 
-        if self.cond_stage_key != "image":
+        if self.cond_stage_key in ["objects_bbox", "objects_center_points"]:
+            figure_size = (x_rec.shape[2], x_rec.shape[3])
+            dataset = kwargs["pl_module"].trainer.datamodule.datasets["validation"]
+            label_for_category_no = dataset.get_textual_label_for_category_no
+            plotter = dataset.conditional_builders[self.cond_stage_key].plot
+            log["conditioning"] = torch.zeros_like(log["reconstructions"])
+            for i in range(quant_c.shape[0]):
+                log["conditioning"][i] = plotter(quant_c[i], label_for_category_no, figure_size)
+            log["conditioning_rec"] = log["conditioning"]
+        elif self.cond_stage_key != "image":
             cond_rec = self.cond_stage_model.decode(quant_c)
             if self.cond_stage_key == "segmentation":
                 # get image from segmentation mask
