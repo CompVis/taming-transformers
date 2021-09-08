@@ -34,6 +34,7 @@ class Net2NetTransformer(pl.LightningModule):
         self.first_stage_key = first_stage_key
         self.cond_stage_key = cond_stage_key
         self.init_first_stage_from_ckpt(first_stage_config)
+        print("First stage initiated")
         self.init_cond_stage_from_ckpt(cond_stage_config)
         if permuter_config is None:
             permuter_config = {"target": "taming.modules.transformer.permuter.Identity"}
