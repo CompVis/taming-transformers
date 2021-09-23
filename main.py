@@ -1,5 +1,5 @@
 import argparse, os, sys, datetime, glob, importlib
-from omegaconf import OmegaConf
+from omegaconf import OmegaConf # Yaml hierarcichal config
 import numpy as np
 from PIL import Image
 import torch
@@ -9,7 +9,7 @@ import pytorch_lightning as pl
 from pytorch_lightning import seed_everything
 from pytorch_lightning.trainer import Trainer
 from pytorch_lightning.callbacks import ModelCheckpoint, Callback, LearningRateMonitor
-from pytorch_lightning.utilities.distributed import rank_zero_only
+from pytorch_lightning.utilities.distributed import rank_zero_only # decorator to ensure that only the first processor execute the method 
 
 def get_obj_from_str(string, reload=False):
     module, cls = string.rsplit(".", 1)
@@ -20,6 +20,9 @@ def get_obj_from_str(string, reload=False):
 
 
 def get_parser(**parser_kwargs):
+    """
+    Get default parser for the experiment
+    """
     def str2bool(v):
         if isinstance(v, bool):
             return v
@@ -111,6 +114,9 @@ def nondefault_trainer_args(opt):
 
 
 def instantiate_from_config(config):
+    """
+    target class is expected to be at "target" and it will be initiated with params
+    """
     if not "target" in config:
         raise KeyError("Expected key `target` to instantiate.")
     return get_obj_from_str(config["target"])(**config.get("params", dict()))
@@ -129,6 +135,9 @@ class WrappedDataset(Dataset):
 
 
 class DataModuleFromConfig(pl.LightningDataModule):
+    """
+    wrap training, validation, and test with dataloaders if wrap is True
+    """
     def __init__(self, batch_size, train=None, validation=None, test=None,
                  wrap=False, num_workers=None):
         super().__init__()
@@ -173,6 +182,9 @@ class DataModuleFromConfig(pl.LightningDataModule):
 
 
 class SetupCallback(Callback):
+    """
+    create the setup for call back such as creating directories" 
+    """
     def __init__(self, resume, now, logdir, ckptdir, cfgdir, config, lightning_config):
         super().__init__()
         self.resume = resume
@@ -213,6 +225,9 @@ class SetupCallback(Callback):
 
 
 class ImageLogger(Callback):
+    """
+    for every epoch, log images from training and validation on wandb, local, test_tube ... etc.
+    """
     def __init__(self, batch_frequency, max_images, clamp=True, increase_log_steps=True):
         super().__init__()
         self.batch_freq = batch_frequency
@@ -524,6 +539,8 @@ if __name__ == "__main__":
         # NOTE according to https://pytorch-lightning.readthedocs.io/en/latest/datamodules.html
         # calling these ourselves should not be necessary but it is.
         # lightning still takes care of proper multiprocessing though
+
+        # load data according to config into training and testing, and wrap them with the model
         data.prepare_data()
         data.setup()
 
@@ -552,7 +569,7 @@ if __name__ == "__main__":
             if trainer.global_rank == 0:
                 import pudb; pudb.set_trace()
 
-        import signal
+        import signal # for asynchronous events
         signal.signal(signal.SIGUSR1, melk)
         signal.signal(signal.SIGUSR2, divein)
 

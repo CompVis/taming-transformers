@@ -1,4 +1,4 @@
-name: taming
+name: taming-celeba
 channels:
   - pytorch
   - defaults
