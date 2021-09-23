@@ -12,14 +12,12 @@ from taming.data.helper_types import Annotation, ImageDescription, Category
 COCO_PATH_STRUCTURE = {
     'train': {
         'top_level': '',
-        'person_annotations': 'annotations/person_keypoints_train2017.json',
         'instances_annotations': 'annotations/instances_train2017.json',
         'stuff_annotations': 'annotations/stuff_train2017.json',
         'files': 'train2017'
     },
     'validation': {
         'top_level': '',
-        'person_annotations': 'annotations/person_keypoints_val2017.json',
         'instances_annotations': 'annotations/instances_val2017.json',
         'stuff_annotations': 'annotations/stuff_val2017.json',
         'files': 'val2017'

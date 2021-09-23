@@ -8,9 +8,12 @@ model:
       params:
         vocab_size: 8192
         block_size: 348  # = 256 + 92 = dim(vqgan_latent_space,16x16) + dim(conditional_builder.embedding_dim)
-        n_layer: 32
+        n_layer: 40
         n_head: 16
-        n_embd: 912
+        n_embd: 1408
+        embd_pdrop: 0.1
+        resid_pdrop: 0.1
+        attn_pdrop: 0.1
     first_stage_config:
       target: taming.models.vqgan.VQModel
       params:
@@ -59,7 +62,7 @@ data:
         crop_method: random-1d
         random_flip: true
         use_group_parameter: true
-        encode_crop: true
+        encode_crop: false
     validation:
       target: taming.data.annotated_objects_coco.AnnotatedObjectsCoco
       params:
@@ -71,7 +74,7 @@ data:
         min_object_area: 0.00001
         min_objects_per_image: 2
         max_objects_per_image: 30
-        crop_method: random-1d
-        random_flip: true
+        crop_method: center
+        random_flip: false
         use_group_parameter: true
         encode_crop: true

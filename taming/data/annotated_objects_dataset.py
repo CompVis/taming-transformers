@@ -99,7 +99,7 @@ class AnnotatedObjectsDataset(Dataset):
         return len(self.categories)
 
     @property
-    def conditional_builders(self):
+    def conditional_builders(self) -> ObjectsCenterPointsConditionalBuilder:
         # cannot set this up in init because no_classes is only known after loading data in init of superclass
         if self._conditional_builders is None:
             self._conditional_builders = {
@@ -109,7 +109,7 @@ class AnnotatedObjectsDataset(Dataset):
                     self.no_tokens,
                     self.encode_crop,
                     self.use_group_parameter,
-                    getattr(self, 'self.use_additional_parameters', False)
+                    getattr(self, 'use_additional_parameters', False)
                 ),
                 'objects_bbox': ObjectsBoundingBoxConditionalBuilder(
                     self.no_classes,
@@ -117,7 +117,7 @@ class AnnotatedObjectsDataset(Dataset):
                     self.no_tokens,
                     self.encode_crop,
                     self.use_group_parameter,
-                    getattr(self, 'self.use_additional_parameters', False)
+                    getattr(self, 'use_additional_parameters', False)
                 )
             }
         return self._conditional_builders
