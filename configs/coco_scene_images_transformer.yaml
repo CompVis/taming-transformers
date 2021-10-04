@@ -47,7 +47,8 @@ model:
 data:
   target: main.DataModuleFromConfig
   params:
-    batch_size: 24
+    batch_size: 6
+    num_workers: 12
     train:
       target: taming.data.annotated_objects_coco.AnnotatedObjectsCoco
       params:
@@ -62,7 +63,7 @@ data:
         crop_method: random-1d
         random_flip: true
         use_group_parameter: true
-        encode_crop: false
+        encode_crop: true
     validation:
       target: taming.data.annotated_objects_coco.AnnotatedObjectsCoco
       params:
