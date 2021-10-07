@@ -1,4 +1,5 @@
-from typing import Dict, Tuple, Literal, Optional, NamedTuple, Union
+from typing import Dict, Tuple, Optional, NamedTuple, Union
+from typing_extensions import Literal
 
 from PIL.Image import Image as pil_image
 from torch import Tensor
