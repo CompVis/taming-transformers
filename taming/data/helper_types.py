@@ -1,7 +1,11 @@
-from typing import Dict, Tuple, Literal, Optional, NamedTuple, Union
-
+from typing import Dict, Tuple, Optional, NamedTuple, Union
 from PIL.Image import Image as pil_image
 from torch import Tensor
+
+try:
+  from typing import Literal
+except ImportError:
+  from typing_extensions import Literal
 
 Image = Union[Tensor, pil_image]
 BoundingBox = Tuple[float, float, float, float]  # x0, y0, w, h
