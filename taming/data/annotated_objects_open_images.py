@@ -33,8 +33,8 @@ OPEN_IMAGES_STRUCTURE = {
 }
 
 
-def load_annotations(descriptor_path: Path, min_object_area: float, category_no_for_id: Dict[str, int]) -> \
-        Dict[str, List[Annotation]]:
+def load_annotations(descriptor_path: Path, min_object_area: float, category_mapping: Dict[str, str],
+                     category_no_for_id: Dict[str, int]) -> Dict[str, List[Annotation]]:
     annotations: Dict[str, List[Annotation]] = defaultdict(list)
     with open(descriptor_path) as file:
         reader = DictReader(file)
@@ -43,6 +43,8 @@ def load_annotations(descriptor_path: Path, min_object_area: float, category_no_
             height = float(row['YMax']) - float(row['YMin'])
             area = width * height
             category_id = row['LabelName']
+            if category_id in category_mapping:
+                category_id = category_mapping[category_id]
             if area >= min_object_area and category_id in category_no_for_id:
                 annotations[row['ImageID']].append(
                     Annotation(
@@ -114,7 +116,8 @@ class AnnotatedObjectsOpenImages(AnnotatedObjectsDataset):
         self.setup_category_id_and_number()
 
         self.image_descriptions = {}
-        annotations = load_annotations(self.paths['annotations'], self.min_object_area, self.category_number)
+        annotations = load_annotations(self.paths['annotations'], self.min_object_area, self.category_mapping,
+                                       self.category_number)
         self.annotations = self.filter_object_number(annotations, self.min_object_area, self.min_objects_per_image,
                                                      self.max_objects_per_image)
         self.image_ids = list(self.annotations.keys())
@@ -129,4 +132,5 @@ class AnnotatedObjectsOpenImages(AnnotatedObjectsDataset):
         return self.paths['files'].joinpath(f'{image_id:0>16}.jpg')
 
     def get_image_description(self, image_id: str) -> Dict[str, Any]:
-        return {'file_path': str(self.get_image_path(image_id))}
+        image_path = self.get_image_path(image_id)
+        return {'file_path': str(image_path), 'file_name': image_path.name}

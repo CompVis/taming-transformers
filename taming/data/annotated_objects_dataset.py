@@ -1,5 +1,6 @@
 from pathlib import Path
 from typing import Optional, List, Callable, Dict, Any, Union
+import warnings
 
 import PIL.Image as pil_image
 from torch import Tensor
@@ -8,6 +9,7 @@ from torchvision import transforms
 
 from taming.data.conditional_builder.objects_bbox import ObjectsBoundingBoxConditionalBuilder
 from taming.data.conditional_builder.objects_center_points import ObjectsCenterPointsConditionalBuilder
+from taming.data.conditional_builder.utils import load_object_from_string
 from taming.data.helper_types import BoundingBox, CropMethodType, Image, Annotation, SplitType
 from taming.data.image_transforms import CenterCropReturnCoordinates, RandomCrop1dReturnCoordinates, \
     Random2dCropReturnCoordinates, RandomHorizontalFlipReturn, convert_pil_to_tensor
@@ -17,7 +19,7 @@ class AnnotatedObjectsDataset(Dataset):
     def __init__(self, data_path: Union[str, Path], split: SplitType, keys: List[str], target_image_size: int,
                  min_object_area: float, min_objects_per_image: int, max_objects_per_image: int,
                  crop_method: CropMethodType, random_flip: bool, no_tokens: int, use_group_parameter: bool,
-                 encode_crop: bool):
+                 encode_crop: bool, category_allow_list_target: str, category_mapping_target: str):
         self.data_path = data_path
         self.split = split
         self.keys = keys
@@ -40,6 +42,12 @@ class AnnotatedObjectsDataset(Dataset):
         self.transform_functions: List[Callable] = self.setup_transform(target_image_size, crop_method, random_flip)
         self.paths = self.build_paths(self.data_path)
         self._conditional_builders = None
+        if category_allow_list_target:
+            allow_list = load_object_from_string(category_allow_list_target)
+            self.category_allow_list = {name for name, _ in allow_list}
+        self.category_mapping = {}
+        if category_mapping_target:
+            self.category_mapping = load_object_from_string(category_mapping_target)
 
     def build_paths(self, top_level: Union[str, Path]) -> Dict[str, Path]:
         top_level = Path(top_level)
@@ -123,12 +131,22 @@ class AnnotatedObjectsDataset(Dataset):
         return self._conditional_builders
 
     def filter_categories(self) -> None:
-        pass
+        if self.category_allow_list:
+            self.categories = {id_: cat for id_, cat in self.categories.items() if cat.name in self.category_allow_list}
+        if self.category_mapping:
+            self.categories = {id_: cat for id_, cat in self.categories.items() if cat.id not in self.category_mapping}
 
     def setup_category_id_and_number(self) -> None:
         self.category_ids = list(self.categories.keys())
         self.category_ids.sort()
+        if '/m/01s55n' in self.category_ids:
+            self.category_ids.remove('/m/01s55n')
+            self.category_ids.append('/m/01s55n')
         self.category_number = {category_id: i for i, category_id in enumerate(self.category_ids)}
+        if self.category_allow_list is not None and self.category_mapping is None \
+                and len(self.category_ids) != len(self.category_allow_list):
+            warnings.warn('Unexpected number of categories: Mismatch with category_allow_list. '
+                          'Make sure all names in category_allow_list exist.')
 
     def clean_up_annotations_and_image_descriptions(self) -> None:
         image_id_set = set(self.image_ids)

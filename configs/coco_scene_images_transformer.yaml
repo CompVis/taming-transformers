@@ -48,13 +48,12 @@ data:
   target: main.DataModuleFromConfig
   params:
     batch_size: 6
-    num_workers: 12
     train:
       target: taming.data.annotated_objects_coco.AnnotatedObjectsCoco
       params:
         data_path: data/coco_annotations_100  # substitute with path to full dataset
         split: train
-        keys: [image, objects_bbox, file_name]
+        keys: [image, objects_bbox, file_name, annotations]
         no_tokens: 8192
         target_image_size: 256
         min_object_area: 0.00001
@@ -69,7 +68,7 @@ data:
       params:
         data_path: data/coco_annotations_100  # substitute with path to full dataset
         split: validation
-        keys: [image, objects_bbox, file_name]
+        keys: [image, objects_bbox, file_name, annotations]
         no_tokens: 8192
         target_image_size: 256
         min_object_area: 0.00001

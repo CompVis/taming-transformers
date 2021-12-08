@@ -8,9 +8,9 @@ model:
       params:
         vocab_size: 8192
         block_size: 348  # = 256 + 92 = dim(vqgan_latent_space,16x16) + dim(conditional_builder.embedding_dim)
-        n_layer: 40
+        n_layer: 36
         n_head: 16
-        n_embd: 1408
+        n_embd: 1536
         embd_pdrop: 0.1
         resid_pdrop: 0.1
         attn_pdrop: 0.1
@@ -48,15 +48,16 @@ data:
   target: main.DataModuleFromConfig
   params:
     batch_size: 6
-    num_workers: 12
     train:
       target: taming.data.annotated_objects_open_images.AnnotatedObjectsOpenImages
       params:
         data_path: data/open_images_annotations_100  # substitute with path to full dataset
         split: train
-        keys: [image, objects_bbox, file_name]
+        keys: [image, objects_bbox, file_name, annotations]
         no_tokens: 8192
         target_image_size: 256
+        category_allow_list_target: taming.data.open_images_helper.top_300_classes_plus_coco_compatibility
+        category_mapping_target: taming.data.open_images_helper.open_images_unify_categories_for_coco
         min_object_area: 0.0001
         min_objects_per_image: 2
         max_objects_per_image: 30
@@ -65,13 +66,15 @@ data:
         use_group_parameter: true
         encode_crop: true
     validation:
-      target: taming.data.annotated_objects_coco.AnnotatedObjectsCoco
+      target: taming.data.annotated_objects_open_images.AnnotatedObjectsOpenImages
       params:
         data_path: data/open_images_annotations_100  # substitute with path to full dataset
         split: validation
-        keys: [image, objects_bbox, file_name]
+        keys: [image, objects_bbox, file_name, annotations]
         no_tokens: 8192
         target_image_size: 256
+        category_allow_list_target: taming.data.open_images_helper.top_300_classes_plus_coco_compatibility
+        category_mapping_target: taming.data.open_images_helper.open_images_unify_categories_for_coco
         min_object_area: 0.0001
         min_objects_per_image: 2
         max_objects_per_image: 30
