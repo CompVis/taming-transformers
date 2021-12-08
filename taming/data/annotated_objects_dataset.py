@@ -137,7 +137,7 @@ class AnnotatedObjectsDataset(Dataset):
 
     @staticmethod
     def filter_object_number(all_annotations: Dict[str, List[Annotation]], min_object_area: float,
-                           min_objects_per_image: int, max_objects_per_image: int) -> Dict[str, List[Annotation]]:
+                             min_objects_per_image: int, max_objects_per_image: int) -> Dict[str, List[Annotation]]:
         filtered = {}
         for image_id, annotations in all_annotations.items():
             annotations_with_min_area = [a for a in annotations if a.area > min_object_area]

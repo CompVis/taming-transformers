@@ -17,7 +17,7 @@ model:
     first_stage_config:
       target: taming.models.vqgan.VQModel
       params:
-        ckpt_path: /path/to/coco_epoch117.ckpt  # https://heibox.uni-heidelberg.de/f/78dea9589974474c97c1/
+        ckpt_path: /path/to/coco_oi_epoch12.ckpt  # https://heibox.uni-heidelberg.de/f/461d9a9f4fcf48ab84f4/
         embed_dim: 256
         n_embed: 8192
         ddconfig:
@@ -50,29 +50,29 @@ data:
     batch_size: 6
     num_workers: 12
     train:
-      target: taming.data.annotated_objects_coco.AnnotatedObjectsCoco
+      target: taming.data.annotated_objects_open_images.AnnotatedObjectsOpenImages
       params:
-        data_path: data/coco_annotations_100  # substitute with path to full dataset
+        data_path: data/open_images_annotations_100  # substitute with path to full dataset
         split: train
         keys: [image, objects_bbox, file_name]
         no_tokens: 8192
         target_image_size: 256
-        min_object_area: 0.00001
+        min_object_area: 0.0001
         min_objects_per_image: 2
         max_objects_per_image: 30
-        crop_method: random-1d
+        crop_method: random-2d
         random_flip: true
         use_group_parameter: true
         encode_crop: true
     validation:
       target: taming.data.annotated_objects_coco.AnnotatedObjectsCoco
       params:
-        data_path: data/coco_annotations_100  # substitute with path to full dataset
+        data_path: data/open_images_annotations_100  # substitute with path to full dataset
         split: validation
         keys: [image, objects_bbox, file_name]
         no_tokens: 8192
         target_image_size: 256
-        min_object_area: 0.00001
+        min_object_area: 0.0001
         min_objects_per_image: 2
         max_objects_per_image: 30
         crop_method: center
