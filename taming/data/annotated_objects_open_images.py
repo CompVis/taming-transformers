@@ -81,7 +81,7 @@ def load_categories(csv_path: Path) -> Dict[str, Category]:
 
 
 class AnnotatedObjectsOpenImages(AnnotatedObjectsDataset):
-    def __init__(self, **kwargs):
+    def __init__(self, use_additional_parameters: bool, **kwargs):
         """
         @param data_path: is the path to the following folder structure:
                           open_images/
@@ -110,6 +110,7 @@ class AnnotatedObjectsOpenImages(AnnotatedObjectsDataset):
         """
 
         super().__init__(**kwargs)
+        self.use_additional_parameters = use_additional_parameters
 
         self.categories = load_categories(self.paths['class_descriptions'])
         self.filter_categories()

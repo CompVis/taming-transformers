@@ -14,7 +14,7 @@ from torchvision.utils import save_image
 from tqdm import tqdm
 
 from scripts.make_samples import get_parser, load_model_and_dset
-from taming.data.conditional_builder.object_center_points_builder import CoordinatesCenterPointsConditionalBuilder
+from taming.data.conditional_builder.objects_center_points import ObjectsCenterPointsConditionalBuilder
 from taming.data.helper_types import BoundingBox, Annotation
 from taming.data.annotated_objects_dataset import AnnotatedObjectsDataset
 from taming.models.cond_transformer import Net2NetTransformer

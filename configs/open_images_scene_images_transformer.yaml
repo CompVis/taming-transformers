@@ -64,6 +64,7 @@ data:
         crop_method: random-2d
         random_flip: true
         use_group_parameter: true
+        use_additional_parameters: true
         encode_crop: true
     validation:
       target: taming.data.annotated_objects_open_images.AnnotatedObjectsOpenImages
@@ -81,4 +82,5 @@ data:
         crop_method: center
         random_flip: false
         use_group_parameter: true
+        use_additional_parameters: true
         encode_crop: true
