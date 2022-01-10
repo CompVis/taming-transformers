@@ -52,7 +52,7 @@ def get_z_indices_crop_out(z_indices: Tensor, predict_x: int, predict_y: int) ->
 
 @torch.no_grad()
 def sample(model: Net2NetTransformer, annotations: List[Annotation], dataset: AnnotatedObjectsDataset,
-           conditional_builder: CoordinatesCenterPointsConditionalBuilder, no_samples: int,
+           conditional_builder: ObjectsCenterPointsConditionalBuilder, no_samples: int,
            temperature: float, top_k: int) -> Tensor:
     x_max, y_max = desired_z_shape[1], desired_z_shape[0]
 
