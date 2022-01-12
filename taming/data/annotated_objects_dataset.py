@@ -19,7 +19,8 @@ class AnnotatedObjectsDataset(Dataset):
     def __init__(self, data_path: Union[str, Path], split: SplitType, keys: List[str], target_image_size: int,
                  min_object_area: float, min_objects_per_image: int, max_objects_per_image: int,
                  crop_method: CropMethodType, random_flip: bool, no_tokens: int, use_group_parameter: bool,
-                 encode_crop: bool, category_allow_list_target: str, category_mapping_target: str):
+                 encode_crop: bool, category_allow_list_target: str, category_mapping_target: str,
+                 no_object_classes: Optional[int] = None):
         self.data_path = data_path
         self.split = split
         self.keys = keys
@@ -48,6 +49,7 @@ class AnnotatedObjectsDataset(Dataset):
         self.category_mapping = {}
         if category_mapping_target:
             self.category_mapping = load_object_from_string(category_mapping_target)
+        self.no_object_classes = no_object_classes
 
     def build_paths(self, top_level: Union[str, Path]) -> Dict[str, Path]:
         top_level = Path(top_level)
@@ -104,7 +106,7 @@ class AnnotatedObjectsDataset(Dataset):
 
     @property
     def no_classes(self) -> int:
-        return len(self.categories)
+        return self.no_object_classes if self.no_object_classes else len(self.categories)
 
     @property
     def conditional_builders(self) -> ObjectsCenterPointsConditionalBuilder:
