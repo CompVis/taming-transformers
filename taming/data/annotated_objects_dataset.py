@@ -19,7 +19,7 @@ class AnnotatedObjectsDataset(Dataset):
     def __init__(self, data_path: Union[str, Path], split: SplitType, keys: List[str], target_image_size: int,
                  min_object_area: float, min_objects_per_image: int, max_objects_per_image: int,
                  crop_method: CropMethodType, random_flip: bool, no_tokens: int, use_group_parameter: bool,
-                 encode_crop: bool, category_allow_list_target: str, category_mapping_target: str,
+                 encode_crop: bool, category_allow_list_target: str = "", category_mapping_target: str = "",
                  no_object_classes: Optional[int] = None):
         self.data_path = data_path
         self.split = split
@@ -43,6 +43,7 @@ class AnnotatedObjectsDataset(Dataset):
         self.transform_functions: List[Callable] = self.setup_transform(target_image_size, crop_method, random_flip)
         self.paths = self.build_paths(self.data_path)
         self._conditional_builders = None
+        self.category_allow_list = None
         if category_allow_list_target:
             allow_list = load_object_from_string(category_allow_list_target)
             self.category_allow_list = {name for name, _ in allow_list}
