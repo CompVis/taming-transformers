@@ -14,7 +14,7 @@ from torchvision.utils import save_image
 from tqdm import tqdm
 
 from scripts.make_samples import get_parser, load_model_and_dset
-from taming.data.conditional_builder.object_center_points_builder import CoordinatesCenterPointsConditionalBuilder
+from taming.data.conditional_builder.objects_center_points import ObjectsCenterPointsConditionalBuilder
 from taming.data.helper_types import BoundingBox, Annotation
 from taming.data.annotated_objects_dataset import AnnotatedObjectsDataset
 from taming.models.cond_transformer import Net2NetTransformer
@@ -52,7 +52,7 @@ def get_z_indices_crop_out(z_indices: Tensor, predict_x: int, predict_y: int) ->
 
 @torch.no_grad()
 def sample(model: Net2NetTransformer, annotations: List[Annotation], dataset: AnnotatedObjectsDataset,
-           conditional_builder: CoordinatesCenterPointsConditionalBuilder, no_samples: int,
+           conditional_builder: ObjectsCenterPointsConditionalBuilder, no_samples: int,
            temperature: float, top_k: int) -> Tensor:
     x_max, y_max = desired_z_shape[1], desired_z_shape[0]
 

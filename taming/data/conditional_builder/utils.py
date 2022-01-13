@@ -1,3 +1,4 @@
+import importlib
 from typing import List, Any, Tuple, Optional
 
 from taming.data.helper_types import BoundingBox, Annotation
@@ -94,3 +95,11 @@ def get_circle_size(figure_size: Tuple[int, int]) -> int:
     if max(figure_size) >= 512:
         circle_size = 4
     return circle_size
+
+
+def load_object_from_string(object_string: str) -> Any:
+    """
+    Source: https://stackoverflow.com/a/10773699
+    """
+    module_name, class_name = object_string.rsplit(".", 1)
+    return getattr(importlib.import_module(module_name), class_name)
