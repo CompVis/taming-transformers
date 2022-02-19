@@ -1,0 +1,13 @@
+version: "3.8"
+
+services: 
+  dev:
+    image: taming-transformers/taming-transformers:latest-dev
+    working_dir: /home/taming-transformers
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - .:/home/taming-transformers
+    environment: 
+      - MODE=development

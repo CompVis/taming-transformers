@@ -1,0 +1,31 @@
+[tool.poetry]
+name = "taming"
+version = "0.1.0"
+description = ""
+authors = ["Egle Grublyte <egle.grublyte@gmail.com>"]
+
+[tool.poetry.dependencies]
+python = "^3.8"
+#cudatoolkit = "^10.2"
+torch = "1.10.0*"
+torchvision = "0.9.1"
+pytorch-lightning = "^1.0.8"
+numpy = "^1.21.5"
+albumentations = "^0.4.3"
+opencv-python = "^4.1.2.30"
+imageio = "^2.9.0"
+imageio-ffmpeg = "^0.4.2"
+omegaconf = "^2.0.0"
+test-tube = "^0.7.5"
+streamlit = "^0.73.1"
+einops = "^0.3.0"
+more-itertools = "^8.0.0"
+transformers = "^4.16.2"
+
+[tool.poetry.dev-dependencies]
+pudb = "^2019.2"
+ipython = "^8.0.1"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
