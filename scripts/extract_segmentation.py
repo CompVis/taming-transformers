@@ -1,24 +1,25 @@
 import sys, os
 import numpy as np
-import scipy
 import torch
 import torch.nn as nn
-from scipy import ndimage
 from tqdm import tqdm, trange
 from PIL import Image
 import torch.hub
 import torchvision
-import torch.nn.functional as F
+from torch.utils.data import DataLoader
+
+from taming.data.sflckr import Examples
 
 # download deeplabv2_resnet101_msc-cocostuff164k-100000.pth from
 # https://github.com/kazuto1011/deeplab-pytorch/releases/download/v1.0/deeplabv2_resnet101_msc-cocostuff164k-100000.pth
 # and put the path here
-CKPT_PATH = "TODO"
+CKPT_PATH = "downloads/deeplabv2_resnet101_msc-cocostuff164k-100000.pth"
 
 rescale = lambda x: (x + 1.) / 2.
 
+
 def rescale_bgr(x):
-    x = (x+1)*127.5
+    x = (x + 1) * 127.5
     x = torch.flip(x, dims=[0])
     return x
 
@@ -83,10 +84,10 @@ def get_input(batch, k):
 def save_segmentation(segmentation, path):
     # --> class label to uint8, save as png
     os.makedirs(os.path.dirname(path), exist_ok=True)
-    assert len(segmentation.shape)==4
-    assert segmentation.shape[0]==1
+    assert len(segmentation.shape) == 4
+    assert segmentation.shape[0] == 1
     for seg in segmentation:
-        seg = seg.permute(1,2,0).numpy().squeeze().astype(np.uint8)
+        seg = seg.permute(1, 2, 0).numpy().squeeze().astype(np.uint8)
         seg = Image.fromarray(seg)
         seg.save(path)
 
@@ -113,18 +114,18 @@ def iterate_dataset(dataloader, destpath, model):
     print("Processed {} files. Bye.".format(num_processed))
 
 
-from taming.data.sflckr import Examples
-from torch.utils.data import DataLoader
-
 if __name__ == "__main__":
     dest = sys.argv[1]
+    prefix = "sflckr"
+    if len(sys.argv) >= 3:
+        prefix = sys.argv[2]
     batchsize = 1
     print("Running with batch-size {}, saving to {}...".format(batchsize, dest))
 
     model = COCOStuffSegmenter({}).cuda()
     print("Instantiated model.")
 
-    dataset = Examples()
+    dataset = Examples(prefix=prefix, no_existing_seg=True)
     dloader = DataLoader(dataset, batch_size=batchsize)
     iterate_dataset(dataloader=dloader, destpath=dest, model=model)
     print("done.")

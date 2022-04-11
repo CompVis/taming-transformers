@@ -10,7 +10,7 @@ class SegmentationBase(Dataset):
     def __init__(self,
                  data_csv, data_root, segmentation_root,
                  size=None, random_crop=False, interpolation="bicubic",
-                 n_labels=182, shift_segmentation=False,
+                 n_labels=182, shift_segmentation=False, no_existing_seg=False
                  ):
         self.n_labels = n_labels
         self.shift_segmentation = shift_segmentation
@@ -27,6 +27,8 @@ class SegmentationBase(Dataset):
             "segmentation_path_": [os.path.join(self.segmentation_root, l.replace(".jpg", ".png"))
                                    for l in self.image_paths]
         }
+        if no_existing_seg:
+            del self.labels["segmentation_path_"]
 
         size = None if size is not None and size<=0 else size
         self.size = size
@@ -60,32 +62,34 @@ class SegmentationBase(Dataset):
         image = np.array(image).astype(np.uint8)
         if self.size is not None:
             image = self.image_rescaler(image=image)["image"]
-        segmentation = Image.open(example["segmentation_path_"])
-        assert segmentation.mode == "L", segmentation.mode
-        segmentation = np.array(segmentation).astype(np.uint8)
-        if self.shift_segmentation:
-            # used to support segmentations containing unlabeled==255 label
-            segmentation = segmentation+1
-        if self.size is not None:
-            segmentation = self.segmentation_rescaler(image=segmentation)["image"]
-        if self.size is not None:
-            processed = self.preprocessor(image=image,
-                                          mask=segmentation
-                                          )
-        else:
-            processed = {"image": image,
-                         "mask": segmentation
-                         }
-        example["image"] = (processed["image"]/127.5 - 1.0).astype(np.float32)
-        segmentation = processed["mask"]
-        onehot = np.eye(self.n_labels)[segmentation]
-        example["segmentation"] = onehot
+        example["image"] = (image / 127.5 - 1.0).astype(np.float32)
+        if "segmentation_path_" in example:
+            segmentation = Image.open(example["segmentation_path_"])
+            assert segmentation.mode == "L", segmentation.mode
+            segmentation = np.array(segmentation).astype(np.uint8)
+            if self.shift_segmentation:
+                # used to support segmentations containing unlabeled==255 label
+                segmentation = segmentation+1
+            if self.size is not None:
+                segmentation = self.segmentation_rescaler(image=segmentation)["image"]
+            if self.size is not None:
+                processed = self.preprocessor(image=image,
+                                              mask=segmentation
+                                              )
+            else:
+                processed = {"image": image,
+                             "mask": segmentation
+                             }
+            segmentation = processed["mask"]
+            onehot = np.eye(self.n_labels)[segmentation]
+            example["segmentation"] = onehot
         return example
 
 
 class Examples(SegmentationBase):
-    def __init__(self, size=None, random_crop=False, interpolation="bicubic"):
-        super().__init__(data_csv="data/sflckr_examples.txt",
-                         data_root="data/sflckr_images",
-                         segmentation_root="data/sflckr_segmentations",
-                         size=size, random_crop=random_crop, interpolation=interpolation)
+    def __init__(self, size=None, random_crop=False, interpolation="bicubic", prefix="sflckr", no_existing_seg=False):
+        super().__init__(data_csv=f"data/{prefix}_examples.txt",
+                         data_root=f"data/{prefix}_images",
+                         segmentation_root=f"data/{prefix}_segmentations",
+                         size=size, random_crop=random_crop, interpolation=interpolation,
+                         no_existing_seg=no_existing_seg)

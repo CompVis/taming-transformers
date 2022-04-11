@@ -1,4 +1,53 @@
 # Taming Transformers for High-Resolution Image Synthesis
+
+## Data
+- Create symlinks to the custom S-FLCKR-10k dataset:
+  - **Images:**
+    ```bash
+    ln -s /work/dagarwal_umass_edu/taming-transformers/data/flickr10k_images ./data/flickr10k_images
+    ```
+  - **Segmentations:**
+    ```bash
+    ln -s /work/dagarwal_umass_edu/taming-transformers/data/flickr10k_segmentations ./data/flickr10k_segmentations
+    ```
+  - **Examples:**
+    ```bash
+    ln -s /work/dagarwal_umass_edu/taming-transformers/data/flickr10k_examples.txt ./data/flickr10k_examples.txt
+    ```
+- Build instructions:
+  - Create environment:
+    ```bash
+    conda create -n sflckr python=3.9 tqdm
+    pip install flickrapi
+    ```
+  - Modify L690 in `.conda/envs/sflckr/lib/python3.9/site-packages/flickrapi/core.py` to:
+    ```python
+    photoset = rsp[0]
+    ```
+  - Download images:
+    ```bash
+    python scripts/build_sflckr.py --n_images=10000 --tag_fpath=data/flickr_tags.txt --output_path=data/flickr10k_images
+    ```
+  - Create examples CSV:
+    ```bash
+    cd data/flickr10k_images; find . -type f -print > ../file.txt; cat ../file.txt | cut -c 3- > ../flickr10k_examples.txt; rm ../file.txt; cd ../..
+    ```
+  - Create segmentation images:
+    - Setup the environment:
+      ```bash
+      conda env create -f environment.yaml
+      conda activate taming
+      ```
+    - Download the `deeplabv2` model:
+      ```bash
+      mkdir downloads; cd downloads; wget https://github.com/kazuto1011/deeplab-pytorch/releases/download/v1.0/deeplabv2_resnet101_msc-cocostuff164k-100000.pth; cd ..
+      ```
+    - Run segmentation script:
+      ```bash
+      python scripts/extract_segmentation.py data/flickr10k_segmentations flickr10k
+      ```
+---
+# [Parent Repo]
 ##### CVPR 2021 (Oral)
 ![teaser](assets/mountain.jpeg)
 
