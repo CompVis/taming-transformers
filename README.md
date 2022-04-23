@@ -46,6 +46,13 @@
       ```bash
       python scripts/extract_segmentation.py data/flickr10k_segmentations flickr10k
       ```
+
+## Training
+- Create symlinks to the sflckr model checkpoints:
+  ```bash
+  ln -s /work/dagarwal_umass_edu/taming-transformers/checkpoints ./checkpoints
+  ```
+
 ---
 # [Parent Repo]
 ##### CVPR 2021 (Oral)
