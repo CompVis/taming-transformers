@@ -13,5 +13,5 @@ if __name__ == "__main__":
     sd = torch.load(inpath, map_location="cpu")
     new_sd = {"state_dict": dict((k.split(".", 1)[-1],v)
                                  for k,v in sd["state_dict"].items()
-                                 if k.startswith("cond_stage_model"))}
+                                 if k.startswith(submodel))}
     torch.save(new_sd, outpath)
