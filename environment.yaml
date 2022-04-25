@@ -22,4 +22,5 @@ dependencies:
     - einops==0.3.0
     - more-itertools>=8.0.0
     - transformers==4.3.1
+    - local-attention==1.4.3
     - -e .

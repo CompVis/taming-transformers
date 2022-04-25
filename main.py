@@ -11,6 +11,8 @@ from pytorch_lightning.trainer import Trainer
 from pytorch_lightning.callbacks import ModelCheckpoint, Callback, LearningRateMonitor
 from pytorch_lightning.utilities.distributed import rank_zero_only
 
+from IPython import embed
+
 from taming.data.utils import custom_collate
 
 

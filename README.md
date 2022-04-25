@@ -52,6 +52,11 @@
   ```bash
   ln -s /work/dagarwal_umass_edu/taming-transformers/checkpoints ./checkpoints
   ```
+- For **local attention**, install the following [dependency](https://github.com/lucidrains/local-attention) 
+(can skip this step if already installed when creating the environment):
+  ```bash
+  pip install local-attention
+  ```
 
 ---
 # [Parent Repo]

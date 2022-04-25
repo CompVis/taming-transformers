@@ -1,0 +1,73 @@
+model:
+  base_learning_rate: 4.5e-06
+  target: taming.models.cond_transformer.Net2NetTransformer
+  params:
+    first_stage_key: image
+    cond_stage_key: segmentation
+    transformer_config:
+      target: taming.modules.transformer.mingpt.GPT
+      params:
+        vocab_size: 1024
+        block_size: 512
+        n_layer: 24
+        n_head: 16
+        n_embd: 1024
+        local_attn: true
+    first_stage_config:
+      target: taming.models.vqgan.VQModel
+      params:
+        ckpt_path: checkpoints/sflckr_first_stage_model.ckpt
+        embed_dim: 256
+        n_embed: 1024
+        ddconfig:
+          double_z: false
+          z_channels: 256
+          resolution: 256
+          in_channels: 3
+          out_ch: 3
+          ch: 128
+          ch_mult:
+          - 1
+          - 1
+          - 2
+          - 2
+          - 4
+          num_res_blocks: 2
+          attn_resolutions:
+          - 16
+          dropout: 0.0
+        lossconfig:
+          target: taming.modules.losses.DummyLoss
+    cond_stage_config:
+      target: taming.models.vqgan.VQModel
+      params:
+        ckpt_path: checkpoints/sflckr_cond_stage_model.ckpt
+        embed_dim: 256
+        n_embed: 1024
+        colorize_nlabels: 182
+        image_key: segmentation
+        ddconfig:
+          double_z: false
+          z_channels: 256
+          resolution: 256
+          in_channels: 182
+          out_ch: 182
+          ch: 128
+          ch_mult:
+          - 1
+          - 1
+          - 2
+          - 2
+          - 4
+          num_res_blocks: 2
+          attn_resolutions:
+          - 16
+          dropout: 0.0
+        lossconfig:
+          target: taming.modules.losses.DummyLoss
+data:
+  target: main.DataModuleFromConfig
+  params:
+    batch_size: 1
+    validation:
+      target: taming.data.sflckr.Examples

@@ -15,6 +15,7 @@ import torch
 import torch.nn as nn
 from torch.nn import functional as F
 from transformers import top_k_top_p_filtering
+from local_attention import LocalAttention
 
 logger = logging.getLogger(__name__)
 
@@ -28,7 +29,7 @@ class GPTConfig:
     def __init__(self, vocab_size, block_size, **kwargs):
         self.vocab_size = vocab_size
         self.block_size = block_size
-        for k,v in kwargs.items():
+        for k, v in kwargs.items():
             setattr(self, k, v)
 
 
@@ -37,6 +38,63 @@ class GPT1Config(GPTConfig):
     n_layer = 12
     n_head = 12
     n_embd = 768
+
+
+class CausalLocalSelfAttention(nn.Module):
+    def __init__(self, config):
+        super().__init__()
+        assert config.n_embd % config.n_head == 0
+        # key, query, value projections for all heads
+        self.key = nn.Linear(config.n_embd, config.n_embd)
+        self.query = nn.Linear(config.n_embd, config.n_embd)
+        self.value = nn.Linear(config.n_embd, config.n_embd)
+        # regularization
+        # self.attn_drop = nn.Dropout(config.attn_pdrop)
+        self.resid_drop = nn.Dropout(config.resid_pdrop)
+        # output projection
+        self.proj = nn.Linear(config.n_embd, config.n_embd)
+        # causal mask to ensure that attention is only applied to the left in the input sequence
+        mask = torch.tril(torch.ones(config.block_size,
+                                     config.block_size))
+        if hasattr(config, "n_unmasked"):
+            mask[:config.n_unmasked, :config.n_unmasked] = 1
+        self.register_buffer("mask", mask.view(1, 1, config.block_size, config.block_size))
+        self.n_head = config.n_head
+
+        # Local attention
+        bl_sz = config.block_size
+        patch_sz = math.sqrt(bl_sz / 2)  # Should be 16 for bl_sz=512
+        pred_index = bl_sz / 2 + ((patch_sz / 2) * patch_sz + (patch_sz / 2 + 1) - 1)  # Should be 392 for bl_sz=512,patch_sz=16
+        self.local_attn = LocalAttention(
+            dim=config.n_embd,  # dimension of each head (needed for relative positional encoding)
+            window_size=math.ceil(pred_index/config.n_layer),  # Should be 17 for pred_index=392,n_layer=24
+            causal=True,  # auto-regressive or not
+            look_backward=1,  # each window looks at the window before
+            look_forward=0,
+            dropout=config.attn_pdrop,  # post-attention dropout
+            exact_windowsize=False
+        )
+
+    def forward(self, x, layer_past=None):
+        B, T, C = x.size()
+
+        # calculate query, key, values for all heads in batch and move head forward to be the batch dim
+        k = self.key(x).view(B, T, self.n_head, C // self.n_head).transpose(1, 2)  # (B, nh, T, hs)
+        q = self.query(x).view(B, T, self.n_head, C // self.n_head).transpose(1, 2)  # (B, nh, T, hs)
+        v = self.value(x).view(B, T, self.n_head, C // self.n_head).transpose(1, 2)  # (B, nh, T, hs)
+
+        present = torch.stack((k, v))
+        if layer_past is not None:
+            past_key, past_value = layer_past
+            k = torch.cat((past_key, k), dim=-2)
+            v = torch.cat((past_value, v), dim=-2)
+
+        # causal local self attention
+        y = self.local_attn(q, k, v, input_mask=self.mask)
+
+        # output projection
+        y = self.resid_drop(self.proj(y))
+        return y, present
 
 
 class CausalSelfAttention(nn.Module):
@@ -101,7 +159,7 @@ class Block(nn.Module):
         super().__init__()
         self.ln1 = nn.LayerNorm(config.n_embd)
         self.ln2 = nn.LayerNorm(config.n_embd)
-        self.attn = CausalSelfAttention(config)
+        self.attn = CausalLocalSelfAttention(config) if config.local_attn else CausalSelfAttention(config)
         self.mlp = nn.Sequential(
             nn.Linear(config.n_embd, 4 * config.n_embd),
             nn.GELU(),  # nice
@@ -125,12 +183,12 @@ class Block(nn.Module):
 class GPT(nn.Module):
     """  the full GPT language model, with a context size of block_size """
     def __init__(self, vocab_size, block_size, n_layer=12, n_head=8, n_embd=256,
-                 embd_pdrop=0., resid_pdrop=0., attn_pdrop=0., n_unmasked=0):
+                 embd_pdrop=0., resid_pdrop=0., attn_pdrop=0., n_unmasked=0, local_attn=False):
         super().__init__()
         config = GPTConfig(vocab_size=vocab_size, block_size=block_size,
                            embd_pdrop=embd_pdrop, resid_pdrop=resid_pdrop, attn_pdrop=attn_pdrop,
                            n_layer=n_layer, n_head=n_head, n_embd=n_embd,
-                           n_unmasked=n_unmasked)
+                           n_unmasked=n_unmasked, local_attn=local_attn)
         # input embedding stem
         self.tok_emb = nn.Embedding(config.vocab_size, config.n_embd)
         self.pos_emb = nn.Parameter(torch.zeros(1, config.block_size, config.n_embd))
@@ -225,12 +283,12 @@ class DummyGPT(nn.Module):
 class CodeGPT(nn.Module):
     """Takes in semi-embeddings"""
     def __init__(self, vocab_size, block_size, in_channels, n_layer=12, n_head=8, n_embd=256,
-                 embd_pdrop=0., resid_pdrop=0., attn_pdrop=0., n_unmasked=0):
+                 embd_pdrop=0., resid_pdrop=0., attn_pdrop=0., n_unmasked=0, local_attn=False):
         super().__init__()
         config = GPTConfig(vocab_size=vocab_size, block_size=block_size,
                            embd_pdrop=embd_pdrop, resid_pdrop=resid_pdrop, attn_pdrop=attn_pdrop,
                            n_layer=n_layer, n_head=n_head, n_embd=n_embd,
-                           n_unmasked=n_unmasked)
+                           n_unmasked=n_unmasked, local_attn=local_attn)
         # input embedding stem
         self.tok_emb = nn.Linear(in_channels, config.n_embd)
         self.pos_emb = nn.Parameter(torch.zeros(1, config.block_size, config.n_embd))
