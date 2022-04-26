@@ -68,5 +68,11 @@ data:
   target: main.DataModuleFromConfig
   params:
     batch_size: 1
+    train:
+      target: taming.data.sflckr.Examples
+      params:
+        prefix: flickr10k
     validation:
       target: taming.data.sflckr.Examples
+      params:
+        prefix: flickr10k
