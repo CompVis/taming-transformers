@@ -177,8 +177,8 @@ class Net2NetTransformer(pl.LightningModule):
         if self.downsample_cond_size > -1:
             c = F.interpolate(c, size=(self.downsample_cond_size, self.downsample_cond_size))
         quant_c, _, [_,_,indices] = self.cond_stage_model.encode(c)
-        if len(indices.shape) > 2:
-            indices = indices.view(c.shape[0], -1)
+        # if len(indices.shape) > 2:
+        indices = indices.view(c.shape[0], -1)
         return quant_c, indices
 
     @torch.no_grad()
