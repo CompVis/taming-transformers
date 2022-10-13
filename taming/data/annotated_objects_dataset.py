@@ -7,11 +7,11 @@ from torch import Tensor
 from torch.utils.data import Dataset
 from torchvision import transforms
 
-from taming.data.conditional_builder.objects_bbox import ObjectsBoundingBoxConditionalBuilder
-from taming.data.conditional_builder.objects_center_points import ObjectsCenterPointsConditionalBuilder
-from taming.data.conditional_builder.utils import load_object_from_string
-from taming.data.helper_types import BoundingBox, CropMethodType, Image, Annotation, SplitType
-from taming.data.image_transforms import CenterCropReturnCoordinates, RandomCrop1dReturnCoordinates, \
+from .conditional_builder.objects_bbox import ObjectsBoundingBoxConditionalBuilder
+from .conditional_builder.objects_center_points import ObjectsCenterPointsConditionalBuilder
+from .conditional_builder.utils import load_object_from_string
+from .helper_types import BoundingBox, CropMethodType, Image, Annotation, SplitType
+from .image_transforms import CenterCropReturnCoordinates, RandomCrop1dReturnCoordinates, \
     Random2dCropReturnCoordinates, RandomHorizontalFlipReturn, convert_pil_to_tensor
 
 

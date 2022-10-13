@@ -5,7 +5,7 @@ import albumentations
 from PIL import Image
 from torch.utils.data import Dataset
 
-from taming.data.sflckr import SegmentationBase # for examples included in repo
+from .sflckr import SegmentationBase # for examples included in repo
 
 
 class Examples(SegmentationBase):

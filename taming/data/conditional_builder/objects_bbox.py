@@ -3,12 +3,12 @@ from typing import List, Tuple, Callable, Optional
 
 from PIL import Image as pil_image, ImageDraw as pil_img_draw, ImageFont
 from more_itertools.recipes import grouper
-from taming.data.image_transforms import convert_pil_to_tensor
 from torch import LongTensor, Tensor
 
-from taming.data.helper_types import BoundingBox, Annotation
-from taming.data.conditional_builder.objects_center_points import ObjectsCenterPointsConditionalBuilder
-from taming.data.conditional_builder.utils import COLOR_PALETTE, WHITE, GRAY_75, BLACK, additional_parameters_string, \
+from ..image_transforms import convert_pil_to_tensor
+from ..helper_types import BoundingBox, Annotation
+from ..conditional_builder.objects_center_points import ObjectsCenterPointsConditionalBuilder
+from ..conditional_builder.utils import COLOR_PALETTE, WHITE, GRAY_75, BLACK, additional_parameters_string, \
     pad_list, get_plot_font_size, absolute_bbox
 
 
