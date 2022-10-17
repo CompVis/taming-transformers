@@ -4,9 +4,10 @@ from pathlib import Path
 from typing import Dict, List, Any
 import warnings
 
+from tqdm import tqdm
+
 from .annotated_objects_dataset import AnnotatedObjectsDataset
 from .helper_types import Annotation, Category
-from tqdm import tqdm
 
 OPEN_IMAGES_STRUCTURE = {
     'train': {

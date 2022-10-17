@@ -3,7 +3,7 @@ import torch
 import torch.nn.functional as F
 import pytorch_lightning as pl
 
-from main import instantiate_from_config
+from ..util import instantiate_from_config
 from ..modules.util import SOSProvider
 
 
