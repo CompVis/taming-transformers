@@ -5,7 +5,7 @@ from typing import Union
 import torch
 from torch import Tensor
 from torchvision.transforms import RandomCrop, functional as F, CenterCrop, RandomHorizontalFlip, PILToTensor
-from torchvision.transforms.functional import _get_image_size as get_image_size
+from torchvision.transforms.functional import get_image_size as get_image_size
 
 from taming.data.helper_types import BoundingBox, Image
 
