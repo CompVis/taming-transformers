@@ -6,11 +6,11 @@ from typing import List, Optional, Tuple, Callable
 
 from PIL import Image as pil_image, ImageDraw as pil_img_draw, ImageFont
 from more_itertools.recipes import grouper
-from taming.data.conditional_builder.utils import COLOR_PALETTE, WHITE, GRAY_75, BLACK, FULL_CROP, filter_annotations, \
+from ..conditional_builder.utils import COLOR_PALETTE, WHITE, GRAY_75, BLACK, FULL_CROP, filter_annotations, \
     additional_parameters_string, horizontally_flip_bbox, pad_list, get_circle_size, get_plot_font_size, \
     absolute_bbox, rescale_annotations
-from taming.data.helper_types import BoundingBox, Annotation
-from taming.data.image_transforms import convert_pil_to_tensor
+from ..helper_types import BoundingBox, Annotation
+from ..image_transforms import convert_pil_to_tensor
 from torch import LongTensor, Tensor
 
 
