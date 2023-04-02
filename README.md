@@ -8,7 +8,7 @@
 [Björn Ommer](https://hci.iwr.uni-heidelberg.de/Staff/bommer)<br/>
 \* equal contribution
 
-**tl;dr** We combine the efficiancy of convolutional approaches with the expressivity of transformers by introducing a convolutional VQGAN, which learns a codebook of context-rich visual parts, whose composition is modeled with an autoregressive transformer.
+**tl;dr** We combine the efficiency of convolutional approaches with the expressivity of transformers by introducing a convolutional VQGAN, which learns a codebook of context-rich visual parts, whose composition is modeled with an autoregressive transformer.
 
 ![teaser](assets/teaser.png)
 [arXiv](https://arxiv.org/abs/2012.09841) | [BibTeX](#bibtex) | [Project Page](https://compvis.github.io/taming-transformers/)
@@ -30,7 +30,7 @@
 - Added accelerated sampling via caching of keys/values in the self-attention operation, used in `scripts/sample_fast.py`.
 - Added a checkpoint of a [VQGAN](https://heibox.uni-heidelberg.de/d/2e5662443a6b4307b470/) trained with f8 compression and Gumbel-Quantization. 
   See also our updated [reconstruction notebook](https://colab.research.google.com/github/CompVis/taming-transformers/blob/master/scripts/reconstruction_usage.ipynb). 
-- We added a [colab notebook](https://colab.research.google.com/github/CompVis/taming-transformers/blob/master/scripts/reconstruction_usage.ipynb) which compares two VQGANs and OpenAI's [DALL-E](https://github.com/openai/DALL-E). See also [this section](#more-resources).
+- We added a [Colab notebook](https://colab.research.google.com/github/CompVis/taming-transformers/blob/master/scripts/reconstruction_usage.ipynb) which compares two VQGANs and OpenAI's [DALL-E](https://github.com/openai/DALL-E). See also [this section](#more-resources).
 - We now include an overview of pretrained models in [Tab.1](#overview-of-pretrained-models). We added models for [COCO](#coco) and [ADE20k](#ade20k).
 - The streamlit demo now supports image completions.
 - We now include a couple of examples from the D-RIN dataset so you can run the
@@ -49,7 +49,7 @@ conda activate taming
 The following table provides an overview of all models that are currently available. 
 FID scores were evaluated using [torch-fidelity](https://github.com/toshas/torch-fidelity).
 For reference, we also include a link to the recently released autoencoder of the [DALL-E](https://github.com/openai/DALL-E) model. 
-See the corresponding [colab
+See the corresponding [Colab
 notebook](https://colab.research.google.com/github/CompVis/taming-transformers/blob/master/scripts/reconstruction_usage.ipynb)
 for a comparison and discussion of reconstruction capabilities.
 
@@ -108,7 +108,7 @@ Download the [2021-04-03T19-39-50_cin_transformer](https://k00.fr/s511rwcv)
 folder and place it into logs.  Sampling from the class-conditional ImageNet
 model does not require any data preparation. To produce 50 samples for each of
 the 1000 classes of ImageNet, with k=600 for top-k sampling, p=0.92 for nucleus
-sampling and temperature t=1.0, run
+sampling, and temperature t=1.0, run
 
 ```
 python scripts/sample_fast.py -r logs/2021-04-03T19-39-50_cin_transformer/ -n 50 -k 600 -t 1.0 -p 0.92 --batch_size 25   
@@ -120,7 +120,7 @@ commas. For example, to sample 50 *ostriches*, *border collies* and *whiskey jug
 ```
 python scripts/sample_fast.py -r logs/2021-04-03T19-39-50_cin_transformer/ -n 50 -k 600 -t 1.0 -p 0.92 --batch_size 25 --classes 9,232,901   
 ```
-We recommended to experiment with the autoregressive decoding parameters (top-k, top-p and temperature) for best results.  
+We recommended to experiment with the autoregressive decoding parameters (top-k, top-p, and temperature) for best results.  
 
 ### FFHQ/CelebA-HQ
 
@@ -129,7 +129,7 @@ Download the [2021-04-23T18-19-01_ffhq_transformer](https://k00.fr/yndvfu95) and
 folders and place them into logs. 
 Again, sampling from these unconditional models does not require any data preparation.
 To produce 50000 samples, with k=250 for top-k sampling,
-p=1.0 for nucleus sampling and temperature t=1.0, run
+p=1.0 for nucleus sampling, and temperature t=1.0, run
 
 ```
 python scripts/sample_fast.py -r logs/2021-04-23T18-19-01_ffhq_transformer/   
@@ -362,7 +362,7 @@ python main.py --base configs/drin_transformer.yaml -t True --gpus 0,
 
 ## More Resources
 ### Comparing Different First Stage Models
-The reconstruction and compression capabilities of different fist stage models can be analyzed in this [colab notebook](https://colab.research.google.com/github/CompVis/taming-transformers/blob/master/scripts/reconstruction_usage.ipynb). 
+The reconstruction and compression capabilities of different first stage models can be analyzed in this [Colab notebook](https://colab.research.google.com/github/CompVis/taming-transformers/blob/master/scripts/reconstruction_usage.ipynb). 
 In particular, the notebook compares two VQGANs with a downsampling factor of f=16 for each and codebook dimensionality of 1024 and 16384, 
 a VQGAN with f=8 and 8192 codebook entries and the discrete autoencoder of OpenAI's [DALL-E](https://github.com/openai/DALL-E) (which has f=8 and 8192 
 codebook entries).
