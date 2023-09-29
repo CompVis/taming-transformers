@@ -10,8 +10,9 @@ from taming.util import get_ckpt_path
 
 class LPIPS(nn.Module):
     # Learned perceptual metric
-    def __init__(self, use_dropout=True):
+    def __init__(self, use_dropout=True, download_directory: str = "/tmp/"):
         super().__init__()
+        self.download_directory = download_directory
         self.scaling_layer = ScalingLayer()
         self.chns = [64, 128, 256, 512, 512]  # vg16 features
         self.net = vgg16(pretrained=True, requires_grad=False)
@@ -25,7 +26,9 @@ class LPIPS(nn.Module):
             param.requires_grad = False
 
     def load_from_pretrained(self, name="vgg_lpips"):
-        ckpt = get_ckpt_path(name, "taming/modules/autoencoder/lpips")
+        root = os.path.join(self.download_directory, "taming/modules/autoencoder/lpips")
+        os.makedirs(root, exist_ok=True)
+        ckpt = get_ckpt_path(name, root)
         self.load_state_dict(torch.load(ckpt, map_location=torch.device("cpu")), strict=False)
         print("loaded pretrained LPIPS loss from {}".format(ckpt))
 
