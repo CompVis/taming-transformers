@@ -1,4 +1,5 @@
 """Stripped version of https://github.com/richzhang/PerceptualSimilarity/tree/master/models"""
+import os
 
 import torch
 import torch.nn as nn
