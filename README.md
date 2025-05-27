@@ -1,3 +1,11 @@
+
+This is a fork of the GitHub repository https://github.com/CompVis/taming-transformers. Due to recent changes in PyTorch, the original CompVis/taming-transformers repository requires small updates to remain compatible. I need to use this repo in Chapter 11 of my book Build a Text-to-Image Generator from Scratch with Manning Publications. Rather than asking every reader to manually edit source code, I have created a fork of the repository with these compatibility fixes already applied.
+
+In the file /traming-transformers/taming/data/utils.py, I have changed string_classes to str in line 152. After that, I deleted line 11 of the file (the line that says "from torch._six import string_classes").
+
+
+
+
 # Taming Transformers for High-Resolution Image Synthesis
 ##### CVPR 2021 (Oral)
 ![teaser](assets/mountain.jpeg)
