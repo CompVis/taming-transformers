@@ -1,0 +1,23 @@
+{
+    "adapter\\demo\\inputs\\coco\\000000000139.jpg": [
+        "A woman stands in the dining area at the table.",
+        "A room with chairs, a table, and a woman in it.",
+        "A woman standing in a kitchen by a window",
+        "A person standing at a table in a room.",
+        "A living area with a television and a table"
+    ],
+    "adapter\\demo\\inputs\\coco\\000000000285.jpg": [
+        "A big burly grizzly bear is show with grass in the background.",
+        "The large brown bear has a black nose.",
+        "Closeup of a brown bear sitting in a grassy area.",
+        "A large bear that is sitting on grass. ",
+        "A close up picture of a brown bear's face."
+    ],
+    "adapter\\demo\\inputs\\coco\\000000000632.jpg": [
+        "Bedroom scene with a bookcase, blue comforter and window.",
+        "A bedroom with a bookshelf full of books.",
+        "This room has a bed with blue sheets and a large bookcase",
+        "A bed and a mirror in a small room.",
+        "a bed room with a neatly made bed a window and a book shelf"
+    ]
+}

@@ -1,10 +1,12 @@
 *.ckpt
 .env
 __pycache__
-*.png
-*.jpg
 *.pt
 logs/*
 *.pkl
 .npz
+*.jpg
+*.png
 *.json
+!adapter/demo/inputs/*
+!adapter/demo/inputs/coco/*

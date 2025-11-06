@@ -1,7 +1,57 @@
 # Codeword Perturbation Adapter for VQGAN
+![teaser](assets/uq_image.webp)
 ## Included Scripts File Structure
-
+```
+adapter/
+├── __pycache__/
+├── archive/
+│   └── decode_codewords.py
+├── codebook-work/
+│   └── get_codebook.py
+├── demo/
+│   └── perturber_demo.py
+├── perturbing/
+│   ├── coco-codeword-files/
+│   │   ├── coco_neighbors_data.npz
+│   │   └── neighbors_data.npz
+│   ├── imagenet-codeword-files/
+│   │   └── imagenet_neighbors_data.npz
+│   └── perturber.py
+└── encoder_microservice.py
+```
 ## Usage Guide
+
+### Requirements
+All adapter processes and scripts, excluding encoder_microservice.py can operate within the conda environment defined in the pre-fork taming-tramsformers repository. See original README contents below for setup details.
+
+For use of adapter/encoder_microservice.py, change from the original:
+```
+conda env create -f environment.yaml
+conda activate taming
+```
+to
+```
+conda env create -f environment_adapter.yaml
+conda activate taming_adapter
+```
+
+### Initial Model Setup
+#### For ImageNet:
+Download either:
+
+VQGAN ImageNet (f=16), 1024-codeword model  
+([vqgan_imagenet_f16_1024](https://heibox.uni-heidelberg.de/d/8088892a516d4e3baf92/)) 
+
+**OR**
+
+VQGAN ImageNet (f=16), 16384-codeword model  
+([vqgan_imagenet_f16_16384](https://heibox.uni-heidelberg.de/d/a7530b09fed84f80a887/))
+
+and place it in a new directory `logs/`.
+
+#### For COCO:
+Download [vqgan_coco_81](https://heibox.uni-heidelberg.de/f/78dea9589974474c97c1/) and place it in `logs/`.
+
 
 ### Demo Perturbing Script
 

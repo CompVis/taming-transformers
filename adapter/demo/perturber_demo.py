@@ -245,11 +245,11 @@ if __name__ == "__main__":
 	# ------------------------------------------------------------------------------
 	# Codeword neighbours are generated in the LatentLab repository in codeword_nearest_neighbours.ipynb.
 	if MODEL == "imagenet":
-		IMAGE_DATA_PATH = "inputs/zsc/validation_images_and_labels_500.json"
+		IMAGE_DATA_PATH = "adapter/demo/inputs/imagenet/demo_images_and_labels.json"
 		CODEWORD_NEIGHBOURS_PATH = "adapter/perturbing/imagenet-codeword-files/imagenet_neighbors_data.npz"
 	elif MODEL == "coco":
 		CODEWORD_NEIGHBOURS_PATH = "adapter/perturbing/coco-codeword-files/coco_neighbors_data.npz"
-		IMAGE_DATA_PATH = "inputs/itm/images_and_captions.json"
+		IMAGE_DATA_PATH = "adapter/demo/inputs/coco/demo_images_and_captions.json"
 	else:
 		raise ValueError("Unsupported MODEL type. Choose 'coco' or 'imagenet'.")
 	#------------------------------------------------------------------------------
