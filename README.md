@@ -19,45 +19,135 @@ adapter/
 │   └── perturber.py
 └── encoder_microservice.py
 ```
-## Usage Guide
 
-### Requirements
+## Requirements
 All adapter processes and scripts, excluding encoder_microservice.py can operate within the conda environment defined in the pre-fork taming-tramsformers repository. See original README contents below for setup details.
 
 For use of adapter/encoder_microservice.py, change from the original:
-```
+```bash
 conda env create -f environment.yaml
 conda activate taming
 ```
 to
-```
+```bash
 conda env create -f environment_adapter.yaml
 conda activate taming_adapter
 ```
-
+  
+---
 ### Initial Model Setup
-#### For ImageNet:
+
+**For ImageNet:**  
+
 Download either:
 
-VQGAN ImageNet (f=16), 1024-codeword model  
-([vqgan_imagenet_f16_1024](https://heibox.uni-heidelberg.de/d/8088892a516d4e3baf92/)) 
-
-**OR**
-
-VQGAN ImageNet (f=16), 16384-codeword model  
-([vqgan_imagenet_f16_16384](https://heibox.uni-heidelberg.de/d/a7530b09fed84f80a887/))
+VQGAN ImageNet (f=16), 1024-codeword model ([vqgan_imagenet_f16_1024](https://heibox.uni-heidelberg.de/d/8088892a516d4e3baf92/))  
+**OR**  
+VQGAN ImageNet (f=16), 16384-codeword model ([vqgan_imagenet_f16_16384](https://heibox.uni-heidelberg.de/d/a7530b09fed84f80a887/))
 
 and place it in a new directory `logs/`.
 
-#### For COCO:
+**For COCO:**
+
 Download [vqgan_coco_81](https://heibox.uni-heidelberg.de/f/78dea9589974474c97c1/) and place it in `logs/`.
 
 
-### Demo Perturbing Script
+## Usage Guide - `perturber.py`
 
-### Raw Perturbing Script
+`perturber.py` generates latent-space perturbations using the pretrained VQ-GAN models loaded from the above checkpoints.
+It reconstructs each image, identifies the most frequently used codewords in its latent map, and swaps them with their nearest and furthest neighbours in the learned codebook.  
+This produces visually perturbed reconstructions for analysis.
 
-### VQGAN Microservice
+### Other Dependencies
+The following dependencies can be created using the tools documented in the LatentLab repository:
+- Codeword neighbour data must be precomputed (see pre-completed examples for the two documented models: `imagenet_neighbors_data.npz` and `coco_neighbors_data.npz`). The paths to these files must be input in the outlined section in `perturber.py` close to line 250. See variables `IMAGE_DATA_PATH`, and `CODEWORD_NEIGHBOURS_PATH`
+- Image metadata files must be generated for the required models.
+
+---
+
+### Running the Script
+
+```bash
+python perturber.py --model imagenet --max_images 5 --k_nearest 20 --k_furthest 20 --output_path demo/outputs
+```
+`perturber_demo.py` is operable using the same call structure and CL arguments. It has all dependencies already included, and can be run immediately once a conda environment has been established. There are only 3 images present for each COCO and ImageNet in the demo, so setting max_images above 3 will not yield additional perturbations.
+
+
+#### Key Arguments
+| Argument | Default | Description |
+|-----------|----------|-------------|
+| `--model` | `imagenet` | Choose between `imagenet` or `coco`. |
+| `--display_config` | *(flag)* | Print model configuration to console. |
+| `--max_images` | `2` | Number of images to process from the metadata file. |
+| `--k_nearest` | `20` | Number of most-prominent codewords to replace with nearest neighbours. |
+| `--k_furthest` | `20` | Number of most-prominent codewords to replace with furthest neighbours. |
+| `--output_path` | `adapter/demo/outputs` | Root folder where outputs and metadata will be saved. |
+
+---
+
+### Output Structure
+
+Each processed image gets its own subfolder under  
+`specified-path/outputs/perturbed-<MODEL>/...`  
+With each image file name becoming the directory of its perturbations.
+COCO example for perturbations of `000000000139.jpg`:  
+```
+adapter/demo/outputs/perturbed-coco/000000000139/
+├── reconstructed_no_pert.png
+├── ns_0_most_prominent.png
+├── ns_1_most_prominent.png
+├── fs_0_most_prominent.png
+├── fs_1_most_prominent.png
+└── ...
+```
+
+ImageNet has an additional level of structure, where the class directories are also present in the output structure. Example for perturbations of `ILSVRC2012_val_00021740.JPEG` with ImageNet class ID n01440764 (tench)
+
+```
+adapter/demo/outputs/perturbed-imagenet/n01440764/ILSVRC2012_val_00021740/
+├── reconstructed_no_pert.png
+├── ns_0_most_prominent.png
+├── ns_1_most_prominent.png
+├── fs_0_most_prominent.png
+├── fs_1_most_prominent.png
+└── ...
+```
+
+A global metadata file summarizing all generated images is also saved:
+```
+demo/outputs/perturbed-imagenet/generated_images.json
+```
+
+Each record contains reconstruction metadata:
+```json
+{
+  "swap_type": "nearest",
+  "num_swaps": 3,
+  "reconstructed_only": false
+}
+```
+
+---
+
+### How It Works
+1. **Encode:** Image → latent code indices via VQ-GAN encoder  
+2. **Rank:** Identify most frequent codewords in the latent map  
+3. **Perturb:** Iteratively swap each with nearest/furthest neighbour embeddings  
+4. **Decode:** Reconstruct perturbed image via VQ-GAN decoder  
+5. **Log:** Save all outputs + metadata for evaluation
+
+---
+
+### Tips
+- To skip one perturbation type, modify the `do_knn` or `do_kfn` flags inside `generate_images()`.  
+- Generated image sets are cumulative - each successive swap builds on the previous latent state.  
+- For large datasets, start with a smaller `--max_images` to test performance. 
+- `perturber.py` will first count the number of files present in the dirs it works in during perturbation generation. It will count the present files and if the it matches the number of expected perturbed images for that directory it will skip generation and continue on to perform the next image's perturbations. This prevents unnecessary computation of perturbations that alredy exist. 
+- If you want a clean generation, direct the output root to an empty directory.
+- To view the model config structure, run with `--display_config`.
+
+
+## Usage Guide - VQGAN Microservice
 
 
 See original Repo README content below.

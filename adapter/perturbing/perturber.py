@@ -227,7 +227,7 @@ if __name__ == "__main__":
 	                    help="Number of nearest neighbours to use")	
 	parser.add_argument("--k_furthest", type=int, default=20,
 	                    help="Number of furthest neighbours to use")	
-	parser.add_argument("--output_path", type=str, default="demo/outputs",
+	parser.add_argument("--output_path", type=str, default="adapter/demo/outputs",
 	                    help="Output path for generated results")	
 	
 	# Parse arguments from the command line
@@ -242,13 +242,17 @@ if __name__ == "__main__":
 	OUTPUT_PATH = args.output_path	
 	# ------------------------------------------------------------------------------
 	# Codeword neighbours are generated in the LatentLab repository in codeword_nearest_neighbours.ipynb.
-	# Update these paths if needed
+	# Update these paths to your generated metadata files from LatentLab.
+	# These metadata files must be in the format matching the demo files.
+	# For imagenet, it is expected that images are sorted into class subdirectories. The demo images provide an 
+	# example of this structure, where images' immediate directories are the ID of their respective class.
+	# 
 	if MODEL == "imagenet":
-		IMAGE_DATA_PATH = "inputs/zsc/validation_images_and_labels_500.json"
+		IMAGE_DATA_PATH = "your_images_and_labels.json"
 		CODEWORD_NEIGHBOURS_PATH = "adapter/perturbing/imagenet-codeword-files/imagenet_neighbors_data.npz"
 	elif MODEL == "coco":
 		CODEWORD_NEIGHBOURS_PATH = "adapter/perturbing/coco-codeword-files/coco_neighbors_data.npz"
-		IMAGE_DATA_PATH = "inputs/itm/images_and_captions.json"
+		IMAGE_DATA_PATH = "your_images_and_captions.json"
 	else:
 		raise ValueError("Unsupported MODEL type. Choose 'coco' or 'imagenet'.")
 	#------------------------------------------------------------------------------
