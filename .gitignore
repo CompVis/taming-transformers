@@ -1,0 +1,10 @@
+*.ckpt
+.env
+__pycache__
+*.png
+*.jpg
+*.pt
+logs/*
+*.pkl
+.npz
+*.json
