@@ -1,3 +1,16 @@
+# Codeword Perturbation Adapter for VQGAN
+## Included Scripts File Structure
+
+## Usage Guide
+
+### Demo Perturbing Script
+
+### Raw Perturbing Script
+
+### VQGAN Microservice
+
+
+See original Repo README content below.
 # Taming Transformers for High-Resolution Image Synthesis
 ##### CVPR 2021 (Oral)
 ![teaser](assets/mountain.jpeg)

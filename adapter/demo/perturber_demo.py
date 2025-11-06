@@ -243,7 +243,7 @@ if __name__ == "__main__":
 	K_FURTHEST = args.k_furthest
 	OUTPUT_PATH = f"adapter/demo/{args.output_path}"	
 	# ------------------------------------------------------------------------------
-
+	# Codeword neighbours are generated in the LatentLab repository in codeword_nearest_neighbours.ipynb.
 	if MODEL == "imagenet":
 		IMAGE_DATA_PATH = "inputs/zsc/validation_images_and_labels_500.json"
 		CODEWORD_NEIGHBOURS_PATH = "adapter/perturbing/imagenet-codeword-files/imagenet_neighbors_data.npz"

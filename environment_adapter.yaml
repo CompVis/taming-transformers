@@ -22,4 +22,7 @@ dependencies:
     - einops==0.3.0
     - more-itertools>=8.0.0
     - transformers==4.3.1
+    - uvicorn==0.33.0
+    - fastapi==0.116.1
+    - python-multipart==0.0.20
     - -e .
