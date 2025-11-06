@@ -147,7 +147,102 @@ Each record contains reconstruction metadata:
 - To view the model config structure, run with `--display_config`.
 
 
-## Usage Guide - VQGAN Microservice
+## Usage Guide - `encoder_microservice.py`
+
+`encoder_microservice.py` launches a lightweight FastAPI microservice that provides VQ-GAN encoding and decoding over HTTP. 
+It allows external scripts or applications to send an image and receive its latent representation, or to send a latent array and receive the reconstructed image. This allows the perturbation functionality to be integrated with other components, for example perturbation pipelines or CLIP/BLIP evaluators that operate in a newer python version.
+
+---
+
+### Starting the Server
+
+Run the following command from the repository root:
+
+```bash
+uvicorn adapter.encoder_microservice:app --host 0.0.0.0 --port 8000
+````
+
+- `--host 0.0.0.0` makes the service accessible from all network interfaces
+- `--port 8000` sets the listening port (customizable)
+
+The server loads the pretrained COCO VQ-GAN checkpoint located at:
+
+```
+logs/coco_epoch117.ckpt
+```
+
+---
+
+### API Endpoints
+
+#### 1. `/encode` - Convert Image -> Latent
+
+**Method:** `POST`  
+**Input:** image file  
+**Output:** base64-encoded NumPy array containing the latent tensor
+
+Example request (using `curl`):
+
+```bash
+curl -X POST "http://localhost:8000/encode" \
+     -F "file=@example.jpg"
+```
+
+Example response:
+
+```json
+{
+  "latent_b64": "gASVewAAAAAAAAB9lCiMB2FycmF5X2RhdGGUk5Qu..."
+}
+```
+
+---
+
+#### 2. `/decode` - Convert Latent -> Image
+
+**Method:** `POST`  
+**Input:** JSON payload with base64-encoded latent  
+**Output:** Reconstructed image (`image/png`)
+
+Example request:
+
+```bash
+curl -X POST "http://localhost:8000/decode" \
+     -H "Content-Type: application/json" \
+     -d '{"latent_b64": "gASVewAAAAAAAAB9lCiMB2FycmF5X2RhdGGUk5Qu..."}' \
+     --output decoded.png
+```
+
+This will save the reconstructed image locally as `decoded.png`.
+
+---
+
+### Processing Steps
+
+1. **Preprocess:** Input images are resized and normalized to `[−1, 1]`.
+2. **Encode:** The VQ-GAN encoder converts the image to a quantized latent tensor.
+3. **Base64 Encode:** The latent tensor is serialized to a base64 string for transport.
+4. **Decode (optional):** Latent arrays are deserialized and reconstructed into images.
+5. **Response:** The API returns JSON (for `/encode`) or PNG bytes (for `/decode`).
+
+---
+
+### Typical Workflow
+
+1. Send an image to `/encode` to obtain its latent representation.
+2. Optionally modify or perturb the latent vector in Python.
+3. Send the modified latent back to `/decode` to visualize the reconstruction.
+
+This service enables **decoupled latent processing** allowing you to run perturbations, clustering, or transformations externally and still decode them consistently via the same model. It is however slower for large inputs, thus was not used in place of `perturber.py`, which requires pre-build metadata inputs but operates locally in the repository.
+
+---
+
+### Tips
+
+* The default model is COCO-trained VQ-GAN. You can modify `checkpoint_path` in the script to point to another checkpoint (e.g., ImageNet). Imagenet model setup code from `perturber.py` can be used as a guide to set up imagenet functionality in this microservice.
+* All tensors are serialized in CPU mode for cross-platform safety.
+* The output image is automatically denormalized from `[−1, 1]` → `[0, 1]`.
+
 
 
 See original Repo README content below.
