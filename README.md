@@ -244,8 +244,10 @@ This service enables **decoupled latent processing** allowing you to run perturb
 * The output image is automatically denormalized from `[−1, 1]` → `[0, 1]`.
 
 
+---
+---
+### See original taming-transformers README content below:  
 
-See original Repo README content below.
 # Taming Transformers for High-Resolution Image Synthesis
 ##### CVPR 2021 (Oral)
 ![teaser](assets/mountain.jpeg)
