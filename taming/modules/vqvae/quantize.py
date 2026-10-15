@@ -277,9 +277,18 @@ class VectorQuantizer2(nn.Module):
         z_flattened = z.view(-1, self.e_dim)
         # distances from z to embeddings e_j (z - e)^2 = z^2 + e^2 - 2 e * z
 
-        d = torch.sum(z_flattened ** 2, dim=1, keepdim=True) + \
-            torch.sum(self.embedding.weight**2, dim=1) - 2 * \
-            torch.einsum('bd,dn->bn', z_flattened, rearrange(self.embedding.weight, 'n d -> d n'))
+        # The index search is discrete. Keep its norms and dot products in
+        # the same precision: in-place addmm is not subject to autocast.
+        with torch.no_grad():
+            z_distance = z_flattened
+            embedding_distance = self.embedding.weight
+            if z_distance.dtype in (torch.float16, torch.bfloat16):
+                z_distance = z_distance.float()
+            if embedding_distance.dtype in (torch.float16, torch.bfloat16):
+                embedding_distance = embedding_distance.float()
+            d = torch.sum(z_distance ** 2, dim=1, keepdim=True) + \
+                torch.sum(embedding_distance ** 2, dim=1)
+            d.addmm_(z_distance, embedding_distance.t(), alpha=-2)
 
         min_encoding_indices = torch.argmin(d, dim=1)
         z_q = self.embedding(min_encoding_indices).view(z.shape)
